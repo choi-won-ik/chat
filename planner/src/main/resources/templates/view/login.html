@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>로그인</title>
+    <link th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css}"
+      rel="stylesheet">
+    <link th:href="@{https://getbootstrap.com/docs/4.0/examples/signin/signin.css}" rel="stylesheet" crossorigin="anonymous">
+    
+</head>
+<body>
+<div class="container">
+    
+	<form class="form-signin" th:action="@{/login-process}" method="post">
+        <p class="text-center">
+            <img src="/images/nahwasa-profile.png" class="img-thumbnail" style="width: 200px;" alt="이 글이 보인다면 시큐리티 설정 잘못한거임!">
+        </p>
+        <h2 class="form-signin-heading text-center mb-5">nahwasa.com</h2>
+
+        <p>
+            <label for="username" class="sr-only">아이디</label>
+            <input type="text" id="username" name="userid" class="form-control" placeholder="아이디" required="" autofocus="">
+        </p>
+        <p>
+            <label for="password" class="sr-only">비밀번호</label>
+            <input type="password" id="password" name="pw" class="form-control" placeholder="비밀번호" required="">
+        </p>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" id="login_btn">로그인</button>
+    </form>
+	<form class="form-signin" th:action="@{/view/join}" method="get">
+        <button class="btn btn-lg btn-warning btn-block" type="submit">회원가입하기</button>
+    </form>
+
+    <script>
+        const loginBtn = document.getElementById('login_btn');
+
+        loginBtn.addEventListener('click', () => {
+            sessionStorage.setItem('userid', document.getElementById('username').value);
+        });
+    </script>
+</div>
+</body>
+</html>
