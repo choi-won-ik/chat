@@ -24,6 +24,39 @@ $(document).ready(()=>{
     //1. SockJS를 내부에 들고있는 stomp를 내어줌
     var stomp = Stomp.over(sockJs);
 
+	$.ajax({
+		type:"POST",
+		url:"/MessageList",
+		success:(response)=>{
+			response.forEach(item=>{
+				if(item.writer===username){
+					str = "<li class='me'>";
+					str += "<div class='entete'>";
+					str += "<img src='/resources/img/chat/user.png' alt=''>";
+					str += "<h2>"+item.writer+"</h2></div>";
+					str += "<h3>"+item.timestamp+" </h3>";
+					str += "<div class='message'>";
+					str += "<b>" + item.message+ "</b>";
+					str += "</div></li>";
+                   $("#chat").append(str);
+				}
+				else{
+					str = "<li class='you'>";
+					str += "<div class='entete'>";
+					str += "<img src='/resources/img/chat/user.png' alt=''>";
+					str += "<h2>"+item.writer+"</h2></div>";
+					str += "<div class='message'>";
+					str += "<b>" + item.message+ "</b></div>";
+					str += "<h3>"+item.timestamp+" </h3></li>";
+					$("#chat").append(str);
+				}
+			});
+		},
+		error:(jqXHR, textStatus, errorThrown)=>{
+			console.log(jqXHR, textStatus, errorThrown);	
+		}
+	});
+
     //2. connection이 맺어지면 실행
     stomp.connect({}, function (){
        console.log("STOMP Connection")

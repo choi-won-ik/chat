@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.dto.chat.ChatMessageDTO;
+import com.example.demo.service.chat.ChatService;
+import com.example.demo.service.kafka.KafkaConsumer;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,8 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatController {
 	@Autowired
 	private KafkaTemplate<String, ChatMessageDTO> kafkaTemplate;
-//	@Autowired
-//	private KafkaService kafkaService;
+	@Autowired
+	private ChatService chatService;
 
 	@MessageMapping("/chat/message")
 	public void sendMessage(@RequestBody ChatMessageDTO message) {
@@ -52,6 +54,13 @@ public class ChatController {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	@PostMapping("/MessageList")				//JPA에서 findAll()을 사용하여 message정보를 db에서 불러옴
+	public List MessageList() {
+		System.out.println("메시지 확인용!!!!!!");
+		List MsgList = chatService.MessagList();
+		return MsgList;
 	}
 	
 //	@PostMapping("/AllMsg")

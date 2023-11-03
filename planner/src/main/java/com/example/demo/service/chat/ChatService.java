@@ -16,5 +16,7 @@ public interface ChatService {
 	public ChatRoomDTO findRoomById(String roomId);
 	
 	public List findAllRooms();
+
+	public List MessagList();
 			
 }
