@@ -37,7 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 // ajax로 작성자 및 내용을 server에 보낸다.
 @CrossOrigin
 @RestController
-@Slf4j
 public class ChatController {
 	@Autowired
 	private KafkaTemplate<String, ChatMessageDTO> kafkaTemplate;
