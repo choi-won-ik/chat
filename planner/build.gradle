@@ -33,6 +33,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework:spring-websocket'
 	implementation 'org.springframework:spring-messaging'
+	implementation 'org.springframework.boot:spring-boot-devtools'
+
 //	compileOnly 'javax.websocket:javax.websocket-api'
 //	implementation 'javax.annotation:javax.annotation-api'
 	implementation 'org.springframework.kafka:spring-kafka'

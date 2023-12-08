@@ -17,6 +17,8 @@ public interface ChatService {
 	
 	public List findAllRooms();
 
-	public List MessagList();
+	public List UserList(String userid);
+
+	List MessagList();
 			
 }

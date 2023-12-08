@@ -7,19 +7,20 @@ import org.springframework.stereotype.Service;
 import com.example.demo.domain.member.Member;
 import com.example.demo.repository.member.MemberRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class MemberService {
-    private final MemberRepository repository;
+    private final MemberRepository memberRepository;
 
     @Autowired
     public MemberService(MemberRepository repository) {
-        this.repository = repository;
+        this.memberRepository = repository;
     }
 
     public Optional<Member> findOne(String userId) {
-        return repository.findByUserid(userId);
+        return memberRepository.findByUserid(userId);
     }
 
     public boolean isValidMember(String userId, String password) {
@@ -29,4 +30,6 @@ public class MemberService {
         }
         return false;
     }
+
+
 }

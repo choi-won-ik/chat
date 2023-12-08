@@ -11,7 +11,6 @@ import com.example.demo.dto.chat.ChatMessageDTO;
 import com.example.demo.repository.chat.KafkaRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor

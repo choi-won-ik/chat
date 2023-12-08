@@ -23,7 +23,8 @@ $(document).ready(()=>{
     var sockJs = new SockJS("/ws-stomp");
     //1. SockJS를 내부에 들고있는 stomp를 내어줌
     var stomp = Stomp.over(sockJs);
-
+	
+	//  db에서 채팅기록 불러옴
 	$.ajax({
 		type:"POST",
 		url:"/MessageList",
@@ -32,7 +33,6 @@ $(document).ready(()=>{
 				if(item.writer===username){
 					str = "<li class='me'>";
 					str += "<div class='entete'>";
-					str += "<img src='/resources/img/chat/user.png' alt=''>";
 					str += "<h2>"+item.writer+"</h2></div>";
 					str += "<h3>"+item.timestamp+" </h3>";
 					str += "<div class='message'>";
@@ -43,7 +43,6 @@ $(document).ready(()=>{
 				else{
 					str = "<li class='you'>";
 					str += "<div class='entete'>";
-					str += "<img src='/resources/img/chat/user.png' alt=''>";
 					str += "<h2>"+item.writer+"</h2></div>";
 					str += "<div class='message'>";
 					str += "<b>" + item.message+ "</b></div>";
@@ -58,46 +57,42 @@ $(document).ready(()=>{
 	});
 
     //2. connection이 맺어지면 실행
-    stomp.connect({}, function (){
-       console.log("STOMP Connection")
+	stomp.connect({}, function (){
+       
+		//4. subscribe(path, callback)으로 메세지를 받을 수 있음
+		stomp.subscribe("/sub/chat/room/"+roomId, (chat) => {
+			var content = JSON.parse(chat.body);
 
-       //4. subscribe(path, callback)으로 메세지를 받을 수 있음
-       stomp.subscribe("/sub/chat/room/"+roomId, (chat) => {
-           var content = JSON.parse(chat.body);
-
-           var writer = content.writer;
-           var str = '';
-           var message = content.message;
-           var timestamp = content.timestamp;
-           if(message===''){
-        	   return;
-           }else{
-        	   if(writer === username){
-                   str = "<li class='me'>";
-                   str += "<div class='entete'>";
-                   str += "<img src='/resources/img/chat/user.png' alt=''>";
-                   str += "<h2>"+writer+"</h2></div>";
-                   str += "<h3>"+timestamp+" </h3>";
-                   str += "<div class='message'>";
-                   str += "<b>" + message+ "</b>";
-                   str += "</div></li>";
-                   $("#chat").append(str);
-               }
-               else{
-            	   str = "<li class='you'>";
-                   str += "<div class='entete'>";
-                   str += "<img src='/resources/img/chat/user.png' alt=''>";
-                   str += "<h2>"+writer+"</h2></div>";
-                   str += "<div class='message'>";
-                   str += "<b>" + message+ "</b></div>";
-                   str += "<h3>"+timestamp+" </h3></li>";
-                   $("#chat").append(str);
-               } 
-           }  
-       });
-    });
-    
-    
+			var writer = content.writer;
+			var str = '';
+			var message = content.message;
+			var timestamp = content.timestamp;
+			if(message===''){
+				return;
+			}else{
+				if(writer === username){
+					str = "<li class='me'>";
+					str += "<div class='entete'>";
+					str += "<h2>"+writer+"</h2></div>";
+					str += "<h3>"+timestamp+" </h3>";
+					str += "<div class='message'>";
+					str += "<b>" + message+ "</b>";
+					str += "</div></li>";
+					$("#chat").append(str);
+				}
+				else{
+					str = "<li class='you'>";
+					str += "<div class='entete'>";
+					str += "<h2>"+writer+"</h2></div>";
+					str += "<div class='message'>";
+					str += "<b>" + message+ "</b></div>";
+					str += "<h3>"+timestamp+" </h3></li>";
+					$("#chat").append(str);
+				} 
+			}  
+		});
+	});
+   
 	// 버튼 클릭 시 메시지 보내기
 	$("#button-send").on("click", (e)=>{
         var msg = document.getElementById("msg");
@@ -113,11 +108,10 @@ $(document).ready(()=>{
     
     // ENTER키 눌렀을 때 메시지 보내기
 	$("#msg").on("keydown", (e)=>{
-		if (e.key === "Enter") {  
+		if (e.key === "Enter") {
 			e.preventDefault();
-
 			var msg = document.getElementById("msg");
-            
+
 			console.log(username + ":" + msg.value);
 			stomp.send(
 				'/pub/chat/message', 
@@ -125,12 +119,35 @@ $(document).ready(()=>{
 				JSON.stringify({roomId: roomId, message: msg.value, writer: username})
 			);
 			msg.value = '';
-			
+
 			return false;
 		}
 	}); 
 });
 </script>
+
+<script>
+let $chattingPerson = document.querySelectorAll(".chattingPerson");
+
+for(let i=0; i<$chattingPerson.length; i++){
+	$chattingPerson[i].addEventListener('click',()=>{
+		console.log("이호원 병신");
+	});
+}
+</script>
+
+<script>
+	$(document).ready(()=>{
+		const $chattingPerson = document.querySelectorAll('.chattingPerson');
+
+		for (let i = 0; i < $chattingPerson.length; i++) {
+			$chattingPerson[i].addEventListener('click',()=>{
+				console.log("test test test test");
+			});
+		}
+	});
+</script>
+
 <body>
 	<div class="chat_container" style="background-color: #eff3f7;">
 		<aside>
@@ -140,28 +157,22 @@ $(document).ready(()=>{
 				<input type="text" id="searchUser" placeholder="search">
 			</header>
 
-			<ul>
+			<ul id="chattingList">
             <!-- 비 접송 중 -->
-				<li>
+				<li class="chattingPerson">
 					<img src="/img/chat/user.png" alt="">
-					<div>
-						<h2>offline user</h2>
-						<h3>
-							<span class="status orange"></span>
-							offline
-						</h3>
-					</div>
+					<label>
+						<h2>userName</h2>
+						<h3>대화내용</h3>
+					</label>
 				</li>
             <!-- 접속 중 -->
-				<li>
+				<li class="chattingPerson">
 					<img src="/img/chat/user.png" alt="">
-					<div>
-						<h2>on user</h2>
-						<h3>
-							<span class="status green"></span>
-							online
-						</h3>
-					</div>
+					<label>
+						<h2>userName</h2>
+						<h3>대화내용</h3>
+					</label>
 				</li>
 			</ul>
 		</aside>
@@ -173,63 +184,47 @@ $(document).ready(()=>{
 					<h2>test</h2>
 				</div>
 			</header>
-		
+
 			<!-- 메시지 전송 및 받기 -->
 			<div class="body" style="vertical-align: bottom">
 				<ul id="chat"></ul>
 			</div>
 
 			<footer>
-			<div id="Buy-Send">
-			<button type="button" id="button-send" >
-					<img src="/img/chat/dm.png" class="dm-icon" id='dm' alt="">
-				</button>
-			
-				
-			</div>	
+				<div id="Buy-Send">
+					<button type="button" id="button-send" >
+						<img src="/img/chat/dm.png" class="dm-icon" id='dm' alt="">
+					</button>
+				</div>
+	
 				<textarea id="msg" placeholder="입력하시오"></textarea>
 			</footer>	
 		</main>
 	</div>
 </body>
-<!--<script type="text/javascript">
-$(document).ready(()=>{
-    $("#searchUser").on("keydown",(e)=>{
-        if(e.key === "Enter"){
-            e.preventDefault();
-            let findUserName = e.target.value;
-            e.target.value='';
-            console.log(findUserName);
-            var $userPlusButton =document.getElementById('userPlusButton');
-            
-            $.ajax({
-				url:'./findUserName',
-				type: 'POST',
-				data: findUserName,
-				contentType: "application/json",
-				success:(response)=>{
-					console.log(response);
-					if(response == 'find'){
-		                UserSearchButton = "<button type='button' class='plusUser' id='plusUser'>";
-		                UserSearchButton += "<img src='/resources/img/chat/plus.png' class='plus' src=''>";
-		                UserSearchButton += "</button>";
-		                $("#userPlusButton").append(UserSearchButton);
-					}
-					else{
-						alert("이름을 확인해 주세요.");
-						if($userPlusButton.firstChild){
-		                	$userPlusButton.removeChild($userPlusButton.firstChild);
-		                console.log('false');
-		                }
 
-					}
-				},error:(data)=>{
-					alert(data);
-				}
-			});
-            return false;
-        }
-    });
+<script type="text/javascript">
+$(document).ready(()=>{
+	var $searchUser = document.getElementById("searchUser");
+	
+	$searchUser.addEventListener('input', ()=>{
+		var UserList = $searchUser.value;
+		console.log(UserList);
+		$.ajax({
+			type : 'POST',
+			url : "/UserList",
+			dataType : "JSON",
+			data : ({
+				userid : UserList
+			}),
+			success:(response)=>{
+				console.log(response);
+			},
+			error :(request, status, error)=>{
+				console.log(error);
+			}
+		})
+	});
 });
-</script>-->
+</script>
 </html>
