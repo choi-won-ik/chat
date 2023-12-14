@@ -61,7 +61,7 @@ public class ChatController {
 		System.out.println("성공!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		Long SomeoneUserNum = chatService.Someone(SomeoneName);
 		model.addAttribute("chattingRoom", chatService.chattingRoom(SomeoneUserNum, SomeoneName));
-		
+
 		System.out.println(SomeoneUserNum);
 		return SomeoneUserNum;
 	}
