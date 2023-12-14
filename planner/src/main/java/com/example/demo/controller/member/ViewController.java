@@ -50,10 +50,5 @@ public class ViewController {
     public String userSettingPage() {
         return "view/user_setting";
     }
-    
-    @GetMapping("/test")
-    public String test(Model model) {
-    model.addAttribute("z","시험테스트");	
-    return "chat/test";
-    }
+   
 }

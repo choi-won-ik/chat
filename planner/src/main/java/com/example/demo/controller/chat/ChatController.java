@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
 
 import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.dto.chat.ChatMessageDTO;
@@ -52,5 +53,16 @@ public class ChatController {
 		System.out.println(userid);
 		List UserName = chatService.UserList(userid);
 		return UserName;
+	}
+	
+	@PostMapping("/Someone")
+	public Long Someone(@RequestParam("SomeoneName") String SomeoneName, Model model) {
+		System.out.println(SomeoneName);
+		System.out.println("성공!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		Long SomeoneUserNum = chatService.Someone(SomeoneName);
+		model.addAttribute("chattingRoom", chatService.chattingRoom(SomeoneUserNum, SomeoneName));
+		
+		System.out.println(SomeoneUserNum);
+		return SomeoneUserNum;
 	}
 }

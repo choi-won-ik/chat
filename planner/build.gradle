@@ -38,7 +38,6 @@ dependencies {
 //	compileOnly 'javax.websocket:javax.websocket-api'
 //	implementation 'javax.annotation:javax.annotation-api'
 	implementation 'org.springframework.kafka:spring-kafka'
-	// https://mvnrepository.com/artifact/org.projectlombok/lombok
 	compileOnly 'org.projectlombok:lombok'
 	
 }

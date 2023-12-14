@@ -15,12 +15,20 @@
 // 모달 열기
 $(document).on('click', '#add-btn',()=>{
     $('#modal').addClass('show');
-	
+	// 유저 검색 창
 	const $inputBox = document.querySelector('.input_box');
-	
 	let UserInput = document.getElementById('input_box');
+	// 보내기 버튼
+	const $modalSend = document.querySelector('.modalSend');
+	// 유저리스트 모음
 	let $ModalUserList = document.getElementById('ModalUserList');
 	
+	// 보내기 버튼이 눌린 상태면 원상복귀 함
+	if($modalSend.classList.contains('save')){
+		$modalSend.classList.remove('save');
+	}
+	
+	// 유저리스트 검색 함수
 	inputBoxFunction=()=>{
 		// 입력 시 이전에 검색했던 UserList 모두 삭제
 		if($ModalUserList){
@@ -38,7 +46,6 @@ $(document).on('click', '#add-btn',()=>{
 			data : ({
 				userid : UserList
 			}),
-			
 			success:(response)=>{
 				response.forEach(item=>{
 					let str = "<div id='ModalUser' class='ModalUser'>";
@@ -70,9 +77,30 @@ $(document).on('click', '#add-btn',()=>{
 		})
 	};
 	
+	// 유저리스트 함수 적용
 	$inputBox.addEventListener('input',inputBoxFunction);
-
 	
+	// 보내기 함수
+	sendFunction=()=>{
+		// 보내기 버튼 클릭 시 클릭 효과 추가
+		if(!$modalSend.classList.contains('save')){
+			$modalSend.classList.toggle('save');
+		}
+		let Someone = $inputBox.value;
+		
+		$.ajax({
+			type : 'POST',
+			url : "/Someone",
+			data:"JSON",
+			data:({SomeoneName:Someone}),
+			success:()=>{console.log("성공")},
+			error:()=>{console.log("실패")}
+		});
+	};
+	
+	
+	// 보내기 버튼을 눌렀을 때
+	$modalSend.addEventListener('mousedown', sendFunction);
 }); 
 
 // 닫기 버튼으로 모달 닫기
@@ -99,9 +127,7 @@ $(document).on('click', '#close_btn', function (e) {
 $(document).on('keydown', (event)=>{
 	const $inputBox = document.querySelector('.input_box');
 	let $ModalUserList = document.getElementById('ModalUserList');
-	
-	
-	
+
 	if(event.key==="Escape"){
 		// UserList 모두 삭제
 		if($ModalUserList){
@@ -113,34 +139,27 @@ $(document).on('keydown', (event)=>{
 			}
 		}
 		
-		$('#modal').removeClass('show'); 
+		$('#modal').removeClass('show');
 		// 모달 종료 시 input_box 비움
 		$inputBox.value="";
-			
+
 	}
 });
 </script>
 
-<script>
-	$(document).ready(()=>{
-		const $modalSend = document.querySelector('.modalSend');
-		
-		// 보내기 버튼을 눌렀을 때
-		$modalSend.addEventListener('mousedown', ()=>{
-			if(!$modalSend.classList.contains('save')){
-				$modalSend.classList.toggle('save');	
-			}
-		});
-		
-		// 보내기 버튼을 때었을 때
-		$modalSend.addEventListener('mouseup', ()=>{
-			if($modalSend.classList.contains('save')){
-				$modalSend.classList.remove('save');
-			}
-			
-		});
-		
+<script th:inline="javascript">
+$(document).ready(function(){
+
+	var roomName = /*[[${roomName}]]*/ "";
+
+	if(roomName != null)
+		alert(roomName + "방이 개설되었습니다.");
+
+	$(".btn-create").on("click", (e)=>{
+		e.preventDefault();
+		var name = $("input[name='name']").val();
 	});
+});
 </script>
 
 
@@ -164,19 +183,13 @@ $(document).on('keydown', (event)=>{
 						</h3>
 					</label>
 				</li>
-
-            	<!-- 접속 중 -->
-				<li class="chattingPerson">
-					<img class="userImg" src="/img/chat/user.png" alt="">
-					<label>
-						<h2>on user</h2>
-						<h3>
-							대화내용
-						</h3>
-					</label>
-				</li>
-
 			</ul>
+			
+			<!--테스트 용-->
+			<ul th:each="room : ${list}">
+				<li><a th:href="@{/chat/room(roomId=${room.roomId})}">[[${room.name}]]</a></li>
+			</ul>
+			
 		</aside>
 
 		<main>

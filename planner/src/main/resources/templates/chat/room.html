@@ -24,7 +24,7 @@ $(document).ready(()=>{
     //1. SockJS를 내부에 들고있는 stomp를 내어줌
     var stomp = Stomp.over(sockJs);
 	
-	//  db에서 채팅기록 불러옴
+	// db에서 채팅기록 불러옴
 	$.ajax({
 		type:"POST",
 		url:"/MessageList",
@@ -88,7 +88,7 @@ $(document).ready(()=>{
 					str += "<b>" + message+ "</b></div>";
 					str += "<h3>"+timestamp+" </h3></li>";
 					$("#chat").append(str);
-				} 
+				}
 			}  
 		});
 	});

@@ -13,12 +13,16 @@ public interface ChatService {
 	public ChatRoomDTO createRoom(String name);
 
 	// 채팅방 방문
-	public ChatRoomDTO findRoomById(String roomId);
+	public ChatRoomDTO findRoomById(Long roomId);
 	
 	public List findAllRooms();
 
 	public List UserList(String userid);
 
 	List MessagList();
+
+	public Long Someone(String SomeoneName);
+
+	public ChatRoomDTO chattingRoom(Long SomeoneUserNum,String SomeoneName);
 			
 }

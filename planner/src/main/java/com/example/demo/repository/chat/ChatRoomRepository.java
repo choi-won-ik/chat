@@ -16,7 +16,7 @@ import jakarta.annotation.PostConstruct;
 @Repository
 public class ChatRoomRepository {
 
-	private Map<String, ChatRoomDTO> chatRoomDTOMap;
+	private Map<Object, ChatRoomDTO> chatRoomDTOMap;
 
 	@PostConstruct
 	private void init(){
@@ -24,7 +24,7 @@ public class ChatRoomRepository {
 	}
 	
 	// 채팅방 방문
-	public ChatRoomDTO findRoomById(String id){
+	public ChatRoomDTO findRoomById(Long id){
 		return chatRoomDTOMap.get(id);
 	}
 
@@ -43,4 +43,11 @@ public class ChatRoomRepository {
 
         return result;
     }
+    
+    // 유저 고유 id로 채팅창 생성
+	public ChatRoomDTO chattingRoom(Long SomeoneUserNum,String SomeoneName) {
+		ChatRoomDTO chattingRoom = new ChatRoomDTO(SomeoneUserNum, SomeoneName);
+		chatRoomDTOMap.put(chattingRoom.getRoomId(), chattingRoom);
+		return chattingRoom;
+	}
 }

@@ -1,6 +1,5 @@
 package com.example.demo.service.chat;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 	@Override
-	public ChatRoomDTO findRoomById(String roomId) {
+	public ChatRoomDTO findRoomById(Long roomId) {
 		return chatRoomRepository.findRoomById(roomId);
 	}
 
@@ -46,6 +45,16 @@ public class ChatServiceImpl implements ChatService{
 	@Override
 	public List UserList(String userid) {
 		return memberRepository.findByUseridStartingWith(userid);
+	}
+
+	@Override
+	public Long Someone(String SomeoneName) {
+		return memberRepository.findIdByUserid(SomeoneName);
+	}
+
+	@Override
+	public ChatRoomDTO chattingRoom(Long SomeoneUserNum,String SomeoneName) {
+		return chatRoomRepository.chattingRoom(SomeoneUserNum, SomeoneName);
 	}
 
 
