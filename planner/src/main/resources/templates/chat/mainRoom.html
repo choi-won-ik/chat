@@ -12,123 +12,146 @@
 <!--<script th:src="@{/js/modal.js}"></script>-->
 
 <script type="text/javascript">
-// 모달 열기
-$(document).on('click', '#add-btn',()=>{
-    $('#modal').addClass('show');
-	// 유저 검색 창
-	const $inputBox = document.querySelector('.input_box');
-	let UserInput = document.getElementById('input_box');
-	// 보내기 버튼
-	const $modalSend = document.querySelector('.modalSend');
-	// 유저리스트 모음
-	let $ModalUserList = document.getElementById('ModalUserList');
-	
-	// 보내기 버튼이 눌린 상태면 원상복귀 함
-	if($modalSend.classList.contains('save')){
-		$modalSend.classList.remove('save');
-	}
-	
-	// 유저리스트 검색 함수
-	inputBoxFunction=()=>{
-		// 입력 시 이전에 검색했던 UserList 모두 삭제
-		if($ModalUserList){
-			while ($ModalUserList.firstChild) {
-				$ModalUserList.removeChild($ModalUserList.firstChild);
+$(document).ready(()=>{
+	// 모달 열기
+	$(document).on('click', '#add-btn',()=>{
+	    $('#modal').addClass('show');
+		// 유저 검색 창
+		const $inputBox = document.querySelector('.input_box');
+		let UserInput = document.getElementById('input_box');
+		// 보내기 버튼
+		const $modalSend = document.querySelector('.modalSend');
+		// 유저리스트 모음
+		let $ModalUserList = document.getElementById('ModalUserList');
+		
+		// 보내기 버튼이 눌린 상태면 원상복귀 함
+		if($modalSend.classList.contains('save')){
+			$modalSend.classList.remove('save');
+		}
+		
+		// 유저리스트 검색 함수
+		inputBoxFunction=()=>{
+			// 입력 시 이전에 검색했던 UserList 모두 삭제
+			if($ModalUserList){
+				while ($ModalUserList.firstChild) {
+					$ModalUserList.removeChild($ModalUserList.firstChild);
+				}
 			}
-		}
+			
+			let UserList = UserInput.value;
+	
+			$.ajax({
+				type : 'POST',
+				url : "/UserList",
+				dataType : "JSON",
+				data : ({
+					userid : UserList
+				}),
+				success:(response)=>{
+					response.forEach(item=>{
+						let str = "<div id='ModalUser' class='ModalUser'>";
+							str += "<img src='/img/chat/user.png' class='ModalUserImg' alt=''>";
+							str += "<label class='ModalUserName' id='ModalUserName'>"+item.userid+"</label></div>";
+						$('#ModalUserList').append(str);
+	
+						const $ModalUser = document.querySelectorAll('.ModalUser');
+	
+						for (let i = 0; i < $ModalUser.length; i++) {
+							// 마우스 커서를 올렸을 때, 포커싱 됨.
+							$ModalUser[i].addEventListener('mouseover',()=>{
+								$ModalUser[i].classList.add('on');
+							});
+							// 유저 클릭 시 유저가 선택됨.
+							$ModalUser[i].addEventListener('click',()=>{
+								let $ModalUserName = document.querySelectorAll('.ModalUserName');
+								$inputBox.value=$ModalUserName[i].innerHTML;
+							});
+							// 마우스 커서를 치웠을 때, 포커싱 됨.
+							$ModalUser[i].addEventListener('mouseout',()=>{
+								if($ModalUser[i].classList.contains('on')){
+									$ModalUser[i].classList.remove('on');
+								}
+							});
+						}
+					});
+				},
+			})
+		};
 		
-		let UserList = UserInput.value;
-
-		$.ajax({
-			type : 'POST',
-			url : "/UserList",
-			dataType : "JSON",
-			data : ({
-				userid : UserList
-			}),
-			success:(response)=>{
-				response.forEach(item=>{
-					let str = "<div id='ModalUser' class='ModalUser'>";
-						str += "<img src='/img/chat/user.png' class='ModalUserImg' alt=''>";
-						str += "<label class='ModalUserName' id='ModalUserName'>"+item.userid+"</label></div>";
-					$('#ModalUserList').append(str);
-
-					const $ModalUser = document.querySelectorAll('.ModalUser');
-
-					for (let i = 0; i < $ModalUser.length; i++) {
-						// 마우스 커서를 올렸을 때, 포커싱 됨.
-						$ModalUser[i].addEventListener('mouseover',()=>{
-							$ModalUser[i].classList.add('on');
-						});
-						// 유저 클릭 시 유저가 선택됨.
-						$ModalUser[i].addEventListener('click',()=>{
-							let $ModalUserName = document.querySelectorAll('.ModalUserName');
-							$inputBox.value=$ModalUserName[i].innerHTML;
-						});
-						// 마우스 커서를 치웠을 때, 포커싱 됨.
-						$ModalUser[i].addEventListener('mouseout',()=>{
-							if($ModalUser[i].classList.contains('on')){
-								$ModalUser[i].classList.remove('on');
+		// 유저리스트 함수 적용
+		$inputBox.addEventListener('input',inputBoxFunction);
+		
+		let chattingUserArray= [];
+		
+		let ArraySuccess ;
+		ArrayPush=(element)=>{
+			if(chattingUserArray.indexOf(element)===-1){
+				chattingUserArray.push(element);
+				ArraySuccess = 1;
+			}else{
+				ArraySuccess =0;
+			}
+		};
+		
+		
+		// 보내기 함수
+		sendFunction=()=>{
+			// 보내기 버튼 클릭 시 클릭 효과 추가
+			if(!$modalSend.classList.contains('save')){
+				$modalSend.classList.toggle('save');
+			}
+			let Someone = $inputBox.value;
+			
+			
+			
+			const $chattingPserson = document.getElementById('chattingPerson');
+			
+			
+			$.ajax({
+				type : 'POST',
+				url : "/Someone",
+				dataType :"JSON",
+				data:({SomeoneName:Someone}),
+				success:(response)=>{
+					
+					
+					
+					let str = "<img class='userImg' src='/img/chat/user.png' alt=''>";
+						str += "<label id='deleteTag'>";
+						str += "<h2>"+Someone+"</h2>";
+						str += "<h3>대화내용</h3></label>";
+							ArrayPush(str);
+							if($chattingPserson && ArraySuccess===1){
+								while ($chattingPserson.firstChild) {
+									$chattingPserson.removeChild($chattingPserson.firstChild);
+								}
+								for(let i=0; i<chattingUserArray.length; i++){
+									$('#chattingPerson').append(chattingUserArray[i]);
+								}
+							}else{
+								console.log("중복");
+								str = "";
 							}
-						});
-					}
-				});
-			},
-		})
-	};
-	
-	// 유저리스트 함수 적용
-	$inputBox.addEventListener('input',inputBoxFunction);
-	
-	// 보내기 함수
-	sendFunction=()=>{
-		// 보내기 버튼 클릭 시 클릭 효과 추가
-		if(!$modalSend.classList.contains('save')){
-			$modalSend.classList.toggle('save');
-		}
-		let Someone = $inputBox.value;
+							
+							
+
+				},
+				error:()=>{
+					alert("없는 유저입니다.");
+				}
+			});
+		};
 		
-		$.ajax({
-			type : 'POST',
-			url : "/Someone",
-			data:"JSON",
-			data:({SomeoneName:Someone}),
-			success:()=>{console.log("성공")},
-			error:()=>{console.log("실패")}
-		});
-	};
+		
+		// 보내기 버튼을 눌렀을 때
+		$modalSend.addEventListener('mousedown', sendFunction);
+	}); 
 	
-	
-	// 보내기 버튼을 눌렀을 때
-	$modalSend.addEventListener('mousedown', sendFunction);
-}); 
-
-// 닫기 버튼으로 모달 닫기
-$(document).on('click', '#close_btn', function (e) {  
-	const $inputBox = document.querySelector('.input_box');
-	let $ModalUserList = document.getElementById('ModalUserList');
-	
-	// UserList 모두 삭제
-	if($ModalUserList){
-		// 모달에 발생된 이벤트 종료
-		$inputBox.removeEventListener('input',inputBoxFunction);
-		// 모달에 있는 userList를 제거
-		while ($ModalUserList.firstChild) {
-			$ModalUserList.removeChild($ModalUserList.firstChild);
-		}
-	}
-	
-    $('#modal').removeClass('show'); 
-	// 모달 종료 시 input_box 비움
-	$inputBox.value="";
-});
-
-// 'ESC'키로 모달 닫기
-$(document).on('keydown', (event)=>{
-	const $inputBox = document.querySelector('.input_box');
-	let $ModalUserList = document.getElementById('ModalUserList');
-
-	if(event.key==="Escape"){
+	// 닫기 버튼으로 모달 닫기
+	$(document).on('click', '#close_btn', function (e) {  
+		const $inputBox = document.querySelector('.input_box');
+		let $ModalUserList = document.getElementById('ModalUserList');
+		
 		// UserList 모두 삭제
 		if($ModalUserList){
 			// 모달에 발생된 이벤트 종료
@@ -139,28 +162,44 @@ $(document).on('keydown', (event)=>{
 			}
 		}
 		
-		$('#modal').removeClass('show');
+	    $('#modal').removeClass('show'); 
 		// 모달 종료 시 input_box 비움
 		$inputBox.value="";
-
-	}
-});
-</script>
-
-<script th:inline="javascript">
-$(document).ready(function(){
-
-	var roomName = /*[[${roomName}]]*/ "";
-
-	if(roomName != null)
-		alert(roomName + "방이 개설되었습니다.");
-
-	$(".btn-create").on("click", (e)=>{
-		e.preventDefault();
-		var name = $("input[name='name']").val();
 	});
+	
+	// 'ESC'키로 모달 닫기
+	$(document).on('keydown', (event)=>{
+		const $inputBox = document.querySelector('.input_box');
+		let $ModalUserList = document.getElementById('ModalUserList');
+	
+		if(event.key==="Escape"){
+			// UserList 모두 삭제
+			if($ModalUserList){
+				// 모달에 발생된 이벤트 종료
+				$inputBox.removeEventListener('input',inputBoxFunction);
+				// 모달에 있는 userList를 제거
+				while ($ModalUserList.firstChild) {
+					$ModalUserList.removeChild($ModalUserList.firstChild);
+				}
+			}
+			
+			$('#modal').removeClass('show');
+			// 모달 종료 시 input_box 비움
+			$inputBox.value="";
+	
+		}
+	});
+	
+
 });
+
+
+
+		
+
+
 </script>
+
 
 
 <body>
@@ -173,22 +212,15 @@ $(document).ready(function(){
 
 			<!-- 왼쪽 대화상대 창 -->
 			<ul class="chattingList">
-				<!-- 비 접송 중 -->
-				<li class="chattingPerson">
-					<img class="userImg" src="/img/chat/user.png" alt="">
-					<label>
-						<h2>offline user</h2>
-						<h3>
-							대화내용
-						</h3>
-					</label>
-				</li>
+				
+				
+				<!--채팅리스트-->
+				<li class="chattingPerson" id="chattingPerson"></li>
+				
+				
+				
 			</ul>
-			
-			<!--테스트 용-->
-			<ul th:each="room : ${list}">
-				<li><a th:href="@{/chat/room(roomId=${room.roomId})}">[[${room.name}]]</a></li>
-			</ul>
+
 			
 		</aside>
 
@@ -227,9 +259,9 @@ $(document).ready(function(){
 
 			
 
-            <div class="m_footer">
-                <button class="modalSend" id="modalSend" style="border: none;">보내기</button>
-            </div>
+            <!--<form class="m_footer" id="send" th:action="@{/chat/test}" method="post">-->
+                <button type="submit" class="modalSend" id="modalSend" style="border: none;">보내기</button>
+            <!--</form>-->
         </div>
     </div>
 </body>

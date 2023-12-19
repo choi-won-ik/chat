@@ -42,4 +42,11 @@ public class ChatRoomController {
 	public void getRoom(Long roomId, Model model){
 	model.addAttribute("room",chatService.findRoomById(roomId));
 	}
+	
+	@GetMapping("/test")
+	public String test() {
+		return "/chat/test";
+	}
+	
+	
 }
