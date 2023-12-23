@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatRoomDTO {
-	private Object roomId;
+	private Long roomId;
 	private String name;
-//	private Set<WebSocketSession> sessions = new HashSet<>();
 }

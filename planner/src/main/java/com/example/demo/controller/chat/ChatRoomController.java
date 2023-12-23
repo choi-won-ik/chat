@@ -33,8 +33,8 @@ public class ChatRoomController {
 	// 채팅창 개설
 	@PostMapping(value = "/room")
     public String create(@RequestParam String name,RedirectAttributes rttr, Model model){
-		model.addAttribute("roomName", chatService.createRoom(name));
-		return "redirect:/chat/rooms";
+		chatService.createRoom(name);
+		return "redirect:/chat/main";
     }
 
 	// 채팅방 방문
@@ -43,10 +43,6 @@ public class ChatRoomController {
 	model.addAttribute("room",chatService.findRoomById(roomId));
 	}
 	
-	@GetMapping("/test")
-	public String test() {
-		return "/chat/test";
-	}
 	
 	
 }

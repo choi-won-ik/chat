@@ -1,6 +1,9 @@
-package com.example.demo.domain.kafka;
+package com.example.demo.domain.chat;
 
-import jakarta.persistence.Column;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.example.demo.domain.member.Member;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,22 +17,18 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "chat")
-public class Chat {
+@Table(name = "chattingroom")
+public class ChattingRoom {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name="roomid")
-	private String roomId;
+	private Long roomId;
 	
-	private String writer;
+	private String name;
 	
-	private String message;
-	
-	private String timestamp;
-	
-	public static Chat messageText(String roomId,String writer,String message,String timestamp) {
-		return new Chat(null,roomId,writer,message,timestamp);
+	public static ChattingRoom createRoom(Long roomId, String name ) {
+		return new ChattingRoom(null, roomId, name);
 	}
+	
 }

@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.domain.kafka.Chat;
+import com.example.demo.domain.chat.Chat;
 import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.domain.kafka.MessageListener;
 import com.example.demo.dto.chat.ChatMessageDTO;
-import com.example.demo.repository.chat.KafkaRepository;
+import com.example.demo.repository.chat.ChatRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class KafkaConsumer {
 	
 	@Autowired
-	private KafkaRepository kafkaRepository;
+	private ChatRepository kafkaRepository;
 	@Autowired
 	private MessageListener messageListener;
 	
