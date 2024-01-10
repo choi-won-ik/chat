@@ -21,8 +21,9 @@ public interface ChatService {
 
 	List MessagList();
 
-	public Long Someone(String SomeoneName);
+	public Long Someone(String TalkerName);
 
-	public ChatRoomDTO chattingRoom(Long SomeoneUserNum,String SomeoneName);
+	public Long roomCreate(String TalkerName, String me,Long SomeoneUserNum);
+
 			
 }

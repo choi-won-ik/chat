@@ -1,68 +1,42 @@
 package com.example.demo.controller.chat;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.demo.domain.kafka.KafkaConstants;
-import com.example.demo.dto.chat.ChatMessageDTO;
 import com.example.demo.service.chat.ChatService;
 
+import lombok.RequiredArgsConstructor;
 
-@CrossOrigin
-@RestController
+@Controller
+@RequiredArgsConstructor
+@RequestMapping(value = "/chat")
 public class ChatController {
-	@Autowired
-	private KafkaTemplate<String, ChatMessageDTO> kafkaTemplate;
 	@Autowired
 	private ChatService chatService;
 
-	@MessageMapping("/chat/message")
-	public void sendMessage(@RequestBody ChatMessageDTO message) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("a hh:mm");			// a:오전/오후 시간대를 알기쉽게 나타냄
-		message.setTimestamp(LocalDateTime.now().format(formatter).toString());			// 메시지 시간을 나타냄
-		try {
-			kafkaTemplate.send(KafkaConstants.KAFKA_TOPIC, message).get();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	@GetMapping("/main")
+	public String main(Model model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String userid = authentication.getName();
+		model.addAttribute("me", userid);
+		return "/chat/mainRoom";
 	}
 
-	@PostMapping("/MessageList")				//JPA에서 findAll()을 사용하여 message정보를 db에서 불러옴
-	public List MessageList() {
-		System.out.println("메시지 확인용!!!!!!");
-		List MsgList = chatService.MessagList();
-		return MsgList;
-	}
-	
-	@PostMapping("/UserList")
-	public List UserList(@RequestParam("userid") String userid) {
-		System.out.println("매우매우 이상암");
-//		List<String> UserName = new ArrayList<>();
-//		UserName.add(UserList);
-		System.out.println(userid);
-		List UserName = chatService.UserList(userid);
-		return UserName;
-	}
-	
-	@PostMapping("/Someone")
-	public Long Someone(@RequestParam("SomeoneName") String SomeoneName, Model model) {
-		System.out.println(SomeoneName);
-		System.out.println("성공!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		Long SomeoneUserNum = chatService.Someone(SomeoneName);
-		model.addAttribute("chattingRoom", chatService.chattingRoom(SomeoneUserNum, SomeoneName));
+	// 채팅창 개설
+	@PostMapping(value = "/room")
+    public String create(@RequestParam String me, RedirectAttributes rttr, Model model){
+		return "redirect:/chat/main";
+    }
 
-		System.out.println(SomeoneUserNum);
-		return SomeoneUserNum;
-	}
+//	// 채팅방 방문
+//	@GetMapping("/room")
+//	public String getRoom(Long roomId, Model model){
+//	model.addAttribute("room",chatService.findRoomById(roomId));
+//	return "/chat/room(roomId="+roomId;
+//	}
 }

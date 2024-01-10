@@ -1,9 +1,6 @@
-package com.example.demo.domain.chat;
+package com.example.demo.Entity.chat;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import com.example.demo.domain.member.Member;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,12 +20,12 @@ public class ChattingRoom {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	private Long roomId;
+	@Column(name="roomid")
+	private String roomId;
 	
-	private String name;
+	private String address;
 	
-	public static ChattingRoom createRoom(Long roomId, String name ) {
-		return new ChattingRoom(null, roomId, name);
-	}
-	
+    public static ChattingRoom createRoom(String roomId, String address) {
+        return new ChattingRoom(null, roomId, address);
+    }
 }

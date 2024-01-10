@@ -7,21 +7,13 @@
 <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js}"></script>
 <link th:href="@{/css/chatting.css}" rel="stylesheet">
 <link th:href="@{/css/button.css}" rel="stylesheet">
-
 <link th:href="@{/css/modal.css}" rel="stylesheet">
 <!--<script th:src="@{/js/modal.js}"></script>-->
-<script th:inline="javascript">			//roomName과 roomId를 var로 받아오는 스크립트
-	let list =[]; 
-	list.push(/*[[${list}]]*/ "");
+<script th:inline="javascript">
+	let me = /*[[${me}]]*/"";
 </script>
 <script type="text/javascript">
 $(document).ready(()=>{
-	console.log("test");
-	for(let i=0; i<list.length; i++){
-		console.log(list.roomId);
-		console.log(list.name);
-		console.log(list);
-	}
 	// 모달 열기
 	$(document).on('click', '#add-btn',()=>{
 	    $('#modal').addClass('show');
@@ -40,7 +32,7 @@ $(document).ready(()=>{
 		const $talkUserName = document.querySelectorAll('#talkUserName');
 		// 모달 폼
 		const formModal = document.getElementById('modal');
-		
+
 		// 보내기 버튼이 눌린 상태면 원상복귀 함
 		if($modalSend.classList.contains('save')){
 			$modalSend.classList.remove('save');
@@ -55,7 +47,7 @@ $(document).ready(()=>{
 			if($ModalUserList.innerHTML===""){
 				$.ajax({
 					type : 'POST',
-					url : "/UserList",
+					url : "/chat/UserList",
 					dataType : "JSON",
 					data : ({
 						userid : UserList
@@ -66,9 +58,9 @@ $(document).ready(()=>{
 								str += "<img src='/img/chat/user.png' class='ModalUserImg' alt=''>";
 								str += "<label class='ModalUserName' id='ModalUserName'>"+item.userid+"</label></div>";
 							$('#ModalUserList').append(str);
-		
+
 							const $ModalUser = document.querySelectorAll('.ModalUser');
-		
+
 							for (let i = 0; i < $ModalUser.length; i++) {
 								// 마우스 커서를 올렸을 때, 포커싱 됨.
 								$ModalUser[i].addEventListener('mouseover',()=>{
@@ -104,7 +96,7 @@ $(document).ready(()=>{
 				chattingUserArray.push(element);
 				ArraySuccess = 1;
 			}else{
-				ArraySuccess =0;
+				ArraySuccess = 0;
 			}
 		};
 		
@@ -127,7 +119,7 @@ $(document).ready(()=>{
 			if(!$modalSend.classList.contains('save')){
 				$modalSend.classList.toggle('save');
 			}
-			let Someone = $inputBox.value;
+			let TalkerName = $inputBox.value;
 			
 
 			
@@ -136,30 +128,28 @@ $(document).ready(()=>{
 			
 			$.ajax({
 				type : 'POST',
-				url : "/Someone",
+				url : "/chat/TalkerName",
 				dataType :"JSON",
-				data:({SomeoneName:Someone}),
+				data:({
+					TalkerName:TalkerName,
+					me:me	
+				}),
 				success:(response)=>{
 
 					formModal.removeEventListener('submit', formMove);
 
-					
-					let str = "<li class='chattingPerson' id='chattingPerson'>";
+					let str = "<ul class='chattingList' id='chattingList'>";
+						str += "<li class='chattingPerson' id='chattingPerson'>";
 						str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 						str += "<label id='deleteTag'>";
-						str += "<h2 id='talkUserName'>"+Someone+"</h2>";
-						str += "<h3>대화내용</h3></label></li>";
+						str += "<h2 id='talkUserName'>"+TalkerName+"</h2>";
+						str += "<h3>대화내용</h3></label></li></ul>";
 						$('.chattingList').append(str);	
 						
 					formModal.submit;	
 				},
 				error:()=>{
-
-					
-
 					alert("없는 유저입니다.");
-					
-
 				}
 			});
 		};
@@ -174,11 +164,7 @@ $(document).ready(()=>{
 		
 		// 보내기 버튼을 눌렀을 때
 		$modalSend.addEventListener('mousedown', sendFunction);
-		
 
-		
-		
-		
 		
 	}); 
 	
@@ -239,23 +225,24 @@ $(document).ready(()=>{
 			<header>
 				<div id="userPlusButton"></div>
 			</header>
-
 			<!-- 왼쪽 대화상대 창 -->
-			<ul class="chattingList" id="chattingList">
+			
 				
-						<ul th:each="room : ${list}">
-			<li><a th:href="@{/chat/room(roomId=${room.roomId})}">[[${room.name}]]</a></li>
-		</ul>
+
 				
-			</ul>
+
 
 			
 		</aside>
 
 		<main>
+			
+				
+			
 			<!-- 메시지 상태 추가 -->
 			<div class="body" style="position: absolute; top: 35%; left: 50%;">
 				<div id="chatHome" style="text-align: center;">
+					
 					<div id="userPlus">
 						<img src="/img/chat/message_4410964.png" class="MsgImg" style="width:100px; height:100px;" alt="">
 					</div>
@@ -277,7 +264,7 @@ $(document).ready(()=>{
 			</div>
 			<div class="m_body">
 				<div class="modal_label">받는 사람 : 
-					<input type="text" class="input_box" id="input_box" name="name" placeholder=" search">
+					<input type="text" class="input_box" id="input_box" name="me" placeholder=" search">
 				</div>
 
 				<!--유저 리스트 검색-->

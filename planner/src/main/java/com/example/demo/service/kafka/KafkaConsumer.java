@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.domain.chat.Chat;
+import com.example.demo.Entity.chat.Chat;
 import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.domain.kafka.MessageListener;
 import com.example.demo.dto.chat.ChatMessageDTO;

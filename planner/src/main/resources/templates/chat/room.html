@@ -27,7 +27,7 @@ $(document).ready(()=>{
 	// db에서 채팅기록 불러옴
 	$.ajax({
 		type:"POST",
-		url:"/MessageList",
+		url:"/chat/MessageList",
 		success:(response)=>{
 			response.forEach(item=>{
 				if(item.writer===username){

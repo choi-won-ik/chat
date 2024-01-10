@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.domain.chat.ChattingRoom;
-import com.example.demo.domain.chat.chattingRoom;
+import com.example.demo.Entity.chat.ChattingRoom;
+import com.example.demo.Entity.member.Member;
 import com.example.demo.dto.chat.ChatRoomDTO;
 import com.example.demo.repository.chat.ChatRoomRepository2;
 import com.example.demo.repository.chat.ChatRepository;
@@ -19,26 +19,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ChatServiceImpl implements ChatService{
 	@Autowired
-	private ChatRoomRepository2 chatRoomRepository;
-	@Autowired
-	private ChatRoomRepository repository;
+	private ChatRoomRepository chatRoomRepository;
 	@Autowired
 	private ChatRepository kafkaRepository;
 	@Autowired
 	private MemberRepository memberRepository;
 
-	@Override
-	public ChatRoomDTO createRoom(String name) {
-		
-		return chatRoomRepository.createRoom(name);
-	}
-	
 	private void validateDuplicateRoom(ChattingRoom chattingRoom) {
 		repository.findByName(chattingRoom.getName())
 			.ifPresent(x->{
 				throw new IllegalStateException("존재하는 방입니다.");
-			});;
-		
+			});
 	}
 
 	@Override
@@ -62,14 +53,35 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 	@Override
-	public Long Someone(String SomeoneName) {
-		return memberRepository.findIdByUserid(SomeoneName);
+	public Long Someone(String TalkerName) {
+		return memberRepository.findIdByUserid(TalkerName);
 	}
 
 	@Override
-	public ChatRoomDTO chattingRoom(Long SomeoneUserNum,String SomeoneName) {
-		return chatRoomRepository.chattingRoom(SomeoneUserNum, SomeoneName);
+	public Long roomCreate(String TalkerName, String me,Long SomeoneUserNum) {
+		Long meNum = memberRepository.findIdByUserid(me);
+		String roomName;
+		String addressName ;
+		if(meNum>SomeoneUserNum) {
+			roomName = meNum+"&"+SomeoneUserNum;
+			addressName = "주소";
+
+		}else {
+			roomName = SomeoneUserNum+"&"+meNum;
+			addressName = "주소";
+		}
+		ChattingRoom chattingRoom = ChattingRoom.createRoom(roomName,addressName);
+		validateDuplicateMember(chattingRoom);
+		chatRoomRepository.save(chattingRoom);
+		
+		return chattingRoom.getId();
 	}
-
-
+	
+	private void validateDuplicateMember(ChattingRoom chattingRoom) {
+		chatRoomRepository.findByRoomId(chattingRoom.getRoomId())
+						.ifPresent(x->{
+							throw new IllegalArgumentException();
+						});
+	}
+	
 }

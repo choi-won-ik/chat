@@ -1,4 +1,4 @@
-package com.example.demo.domain.member;
+package com.example.demo.Entity.member;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 

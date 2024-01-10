@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.example.demo.domain.member.Member;
+import com.example.demo.Entity.member.Member;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	// 유저명으로 해당 id값 불러옴
 //	Long findIdByUserid(String SomeoneName);
 	@Query(
-			value= "SELECT id from member u WHERE userid = :SomeoneName",
+			value= "SELECT id from member u WHERE userid = :TalkerName",
 			nativeQuery  = true
 			)
-	Long findIdByUserid(@Param("SomeoneName") String SomeoneName);
+	Long findIdByUserid(@Param("TalkerName") String TalkerName);
 }
