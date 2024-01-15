@@ -61,8 +61,9 @@ public class ChatRestController {
 	public Long Someone(@RequestParam("TalkerName") String TalkerName,@RequestParam("me") String me, Model model) {
 		System.out.println(TalkerName);
 		System.out.println(me);
-		System.out.println("성공!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		Long SomeoneUserNum = chatService.Someone(TalkerName);
+		System.out.println("여기까지 성공!!!!!!!!!!");
+
 		chatService.roomCreate(TalkerName,me,SomeoneUserNum);
 		System.out.println(SomeoneUserNum);
 		return SomeoneUserNum;

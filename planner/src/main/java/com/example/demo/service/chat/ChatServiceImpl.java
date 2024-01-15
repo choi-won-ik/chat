@@ -1,5 +1,9 @@
 package com.example.demo.service.chat;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.Entity.chat.ChattingRoom;
 import com.example.demo.Entity.member.Member;
-import com.example.demo.dto.chat.ChatRoomDTO;
+import com.example.demo.dto.chat.ChattingRoomDTO;
 import com.example.demo.repository.chat.ChatRoomRepository2;
 import com.example.demo.repository.chat.ChatRepository;
 import com.example.demo.repository.chat.ChatRoomRepository;
@@ -25,15 +29,9 @@ public class ChatServiceImpl implements ChatService{
 	@Autowired
 	private MemberRepository memberRepository;
 
-	private void validateDuplicateRoom(ChattingRoom chattingRoom) {
-		repository.findByName(chattingRoom.getName())
-			.ifPresent(x->{
-				throw new IllegalStateException("존재하는 방입니다.");
-			});
-	}
 
 	@Override
-	public ChatRoomDTO findRoomById(Long roomId) {
+	public ChattingRoomDTO findRoomById(Long roomId) {
 		return chatRoomRepository.findRoomById(roomId);
 	}
 
@@ -57,31 +55,41 @@ public class ChatServiceImpl implements ChatService{
 		return memberRepository.findIdByUserid(TalkerName);
 	}
 
+	// 채팅방 링크 생성
 	@Override
 	public Long roomCreate(String TalkerName, String me,Long SomeoneUserNum) {
 		Long meNum = memberRepository.findIdByUserid(me);
 		String roomName;
-		String addressName ;
+		String  user1;
+		String user2;
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		
+		// 내 고유 id가 상대 고유 id보다 클 때
 		if(meNum>SomeoneUserNum) {
 			roomName = meNum+"&"+SomeoneUserNum;
-			addressName = "주소";
-
-		}else {
-			roomName = SomeoneUserNum+"&"+meNum;
-			addressName = "주소";
+			user1 = me;
+			user2 = TalkerName;
 		}
-		ChattingRoom chattingRoom = ChattingRoom.createRoom(roomName,addressName);
-		validateDuplicateMember(chattingRoom);
+		// 내 고유 id가 생다 공유 id보다 작을 때
+		else {
+			roomName = SomeoneUserNum+"&"+meNum;
+			user1 = TalkerName;
+			user2 = me;
+		}
+		
+		// 방 생성 시 시간 관리
+		LocalDateTime nowTime =LocalDateTime.now(); 
+		String time=nowTime.format(formatter);
+		
+		// db에 내용 저장
+		ChattingRoom chattingRoom = ChattingRoom.createRoom(roomName,user1,user2,time);
 		chatRoomRepository.save(chattingRoom);
 		
 		return chattingRoom.getId();
 	}
-	
-	private void validateDuplicateMember(ChattingRoom chattingRoom) {
-		chatRoomRepository.findByRoomId(chattingRoom.getRoomId())
-						.ifPresent(x->{
-							throw new IllegalArgumentException();
-						});
+
+	// 모든 채팅방 List를 db에서 불러옴
+	public List<ChattingRoom> talkList(){
+		return chatRoomRepository.findAll();
 	}
-	
 }

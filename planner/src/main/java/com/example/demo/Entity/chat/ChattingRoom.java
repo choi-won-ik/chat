@@ -1,6 +1,5 @@
 package com.example.demo.Entity.chat;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,12 +19,16 @@ public class ChattingRoom {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name="roomid")
+	// 채팅방의 코드 ex)3+2
 	private String roomId;
 	
-	private String address;
+	private String user1;
 	
-    public static ChattingRoom createRoom(String roomId, String address) {
-        return new ChattingRoom(null, roomId, address);
-    }
+	private String user2;
+	
+	private String time;
+	
+	public static ChattingRoom createRoom(String roomId,String user1,String user2 , String time) {
+		return new ChattingRoom(null, roomId, user1, user2, time);
+	}
 }

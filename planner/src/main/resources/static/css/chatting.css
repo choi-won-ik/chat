@@ -109,9 +109,11 @@
   aside li:hover{
     background-color:#5e616a;
   }
+  
   h2,h3{
     margin:0;
   }
+  
   aside li img{
     border-radius:50%;
     margin-left:20px;

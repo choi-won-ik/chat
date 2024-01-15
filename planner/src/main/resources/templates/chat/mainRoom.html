@@ -11,27 +11,60 @@
 <!--<script th:src="@{/js/modal.js}"></script>-->
 <script th:inline="javascript">
 	let me = /*[[${me}]]*/"";
+	let talkList=/*[[${talkList}]]*/[];
 </script>
-<script type="text/javascript">
+<script th:inline="javascript">
+	window.onload=()=>{
+		// db에서 chattingRoom 가져오기
+		talkList.forEach((index)=>{
+			link=()=>{
+				window.location.href = "http://localhost:8080/chat/room(roomId="+index.roomId+")";
+				
+				
+				
+			};
+			
+			if(index.user1!==me){
+				let str = "<li class='chattingPerson' id='chattingPerson' onclick='link()'>";
+					str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+					str += "<label id='deleteTag'>";
+					str += "<h2 id='talkUserName'>"+index.user1+"</h2>";
+					str += "<h3>대화내용</h3></label></li>";
+					$('.chattingList').append(str);
+			}else{
+				let str = "<li class='chattingPerson' id='chattingPerson' onclick='link()'>";
+					str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+					str += "<label id='deleteTag'>";
+					str += "<h2 id='talkUserName'>"+index.user2+"</h2>";
+					str += "<h3>대화내용</h3></label></li>";
+					$('.chattingList').append(str);
+			}
+			
+		});
+	};
+</script>
+<script>
 $(document).ready(()=>{
+	// 유저 검색 창
+	const $inputBox = document.querySelector('.input_box');
+	let UserInput = document.getElementById('input_box');
+	// 보내기 버튼
+	const $modalSend = document.querySelector('.modalSend');
+	// 유저리스트 모음
+	let $ModalUserList = document.getElementById('ModalUserList');
+	// 좌측 유저리트스 전체
+	const $chattingList=document.getElementById('chattingList');
+	// 좌측 유저리스트
+	const $chattingPerson = document.querySelectorAll('.chattingPerson');
+	// 좌측 유저리스트 중 유저명
+	const $talkUserName = document.querySelectorAll('#talkUserName');
+	// 모달 폼
+	const formModal = document.getElementById('modal');
+	
 	// 모달 열기
 	$(document).on('click', '#add-btn',()=>{
 	    $('#modal').addClass('show');
-		// 유저 검색 창
-		const $inputBox = document.querySelector('.input_box');
-		let UserInput = document.getElementById('input_box');
-		// 보내기 버튼
-		const $modalSend = document.querySelector('.modalSend');
-		// 유저리스트 모음
-		let $ModalUserList = document.getElementById('ModalUserList');
-		// 좌측 유저리트스 전체
-		const $chattingList=document.getElementById('chattingList');
-		// 좌측 유저리스트
-		const $chattingPerson = document.querySelectorAll('.chattingPerson');
-		// 좌측 유저리스트 중 유저명
-		const $talkUserName = document.querySelectorAll('#talkUserName');
-		// 모달 폼
-		const formModal = document.getElementById('modal');
+
 
 		// 보내기 버튼이 눌린 상태면 원상복귀 함
 		if($modalSend.classList.contains('save')){
@@ -114,17 +147,14 @@ $(document).ready(()=>{
 				event.preventDefault();
 				console.log("폼 제출 막음");
 			};
-				
+
 			// 보내기 버튼 클릭 시 클릭 효과 추가
 			if(!$modalSend.classList.contains('save')){
 				$modalSend.classList.toggle('save');
 			}
 			let TalkerName = $inputBox.value;
-			
 
-			
-			const $chattingPserson = document.getElementById('chattingPerson');
-			
+
 			
 			$.ajax({
 				type : 'POST',
@@ -135,27 +165,27 @@ $(document).ready(()=>{
 					me:me	
 				}),
 				success:(response)=>{
-
-					formModal.removeEventListener('submit', formMove);
-
-					let str = "<ul class='chattingList' id='chattingList'>";
-						str += "<li class='chattingPerson' id='chattingPerson'>";
+					let str = "<li class='chattingPerson' id='chattingPerson'>";
 						str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 						str += "<label id='deleteTag'>";
 						str += "<h2 id='talkUserName'>"+TalkerName+"</h2>";
-						str += "<h3>대화내용</h3></label></li></ul>";
+						str += "<h3>대화내용</h3></label></li>";
 						$('.chattingList').append(str);	
 						
-					formModal.submit;	
+						
+					formModal.removeEventListener('submit', formMove);
+
+						
+					formModal.submit;
 				},
 				error:()=>{
 					alert("없는 유저입니다.");
 				}
 			});
 		};
-		
+
 		// 유저 리스트 클릭 시
-		for(let i = 0; i<$chattingPerson.length; i++){
+		for(let i = 0; i<$chattingPerson.length; i++){	
 			$chattingPerson[i].addEventListener('click',()=>{
 				alert("유저리스트 클릭 함수");
 				console.log($talkUserName[i].innerHTML);
@@ -228,7 +258,7 @@ $(document).ready(()=>{
 			<!-- 왼쪽 대화상대 창 -->
 			
 				
-
+			<ul class='chattingList' id='chattingList'></ul>
 				
 
 
@@ -256,7 +286,7 @@ $(document).ready(()=>{
 
 
 	<!-- 모달 -->
-	<form th:action="@{/chat/room}" method="post" class="modal" id="modal">
+	<form th:action="@{/chat/create}" method="post" class="modal" id="modal">
 		<div class="modal_body">
 			<div class="m_head">
 				<div class="modal_title">새로운 메시지</div>

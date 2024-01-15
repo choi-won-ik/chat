@@ -4,16 +4,17 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.chat.ChatRoomDTO;
+import com.example.demo.Entity.chat.ChattingRoom;
+import com.example.demo.dto.chat.ChattingRoomDTO;
 
 
 @Service
 public interface ChatService {
 	// 채팅방 개설
-	public ChatRoomDTO createRoom(String name);
+	public ChattingRoomDTO createRoom(String name);
 
 	// 채팅방 방문
-	public ChatRoomDTO findRoomById(Long roomId);
+	public ChattingRoomDTO findRoomById(Long roomId);
 	
 	public List findAllRooms();
 
@@ -24,6 +25,8 @@ public interface ChatService {
 	public Long Someone(String TalkerName);
 
 	public Long roomCreate(String TalkerName, String me,Long SomeoneUserNum);
+
+	public List<ChattingRoom> talkList();
 
 			
 }
