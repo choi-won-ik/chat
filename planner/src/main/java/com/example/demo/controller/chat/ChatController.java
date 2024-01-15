@@ -41,9 +41,11 @@ public class ChatController {
 	
 	//채팅방 방문
 	@GetMapping("/room")
-	public ModelAndView room(String roomId) {
-		ModelAndView mv = new ModelAndView("/chat/room");
-		return mv;
+	public String room(String roomId,Model model) {
+		model.addAttribute("room", chatService.findByRoomId(roomId));
+
+		System.out.println("매우매우 이상암!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1");
+		return "/chat/room";
 	}
 
 //	// 채팅방 방문

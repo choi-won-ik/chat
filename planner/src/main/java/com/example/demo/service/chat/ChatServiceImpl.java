@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,5 +92,9 @@ public class ChatServiceImpl implements ChatService{
 	// 모든 채팅방 List를 db에서 불러옴
 	public List<ChattingRoom> talkList(){
 		return chatRoomRepository.findAll();
+	}
+	
+	public Optional<ChattingRoom> findByRoomId(String roomId) {
+		return chatRoomRepository.findByRoomId(roomId);
 	}
 }

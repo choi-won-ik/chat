@@ -15,5 +15,4 @@ public interface ChatRoomRepository extends JpaRepository<ChattingRoom, Long>{
 //			value= "select room_id from chattingroom",
 //			nativeQuery  = true
 //			)
-//	List<String> findAllByRoomId();
 }

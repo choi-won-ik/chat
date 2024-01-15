@@ -18,8 +18,8 @@
 		// db에서 chattingRoom 가져오기
 		talkList.forEach((index)=>{
 			link=()=>{
-				window.location.href = "http://localhost:8080/chat/room(roomId="+index.roomId+")";
-				
+				window.location.href = "http://localhost:8080/chat/room?roomId="+index.roomId;
+//				window.location.href = "http://localhost:8080/chat/room/"+index.roomId;
 				
 				
 			};

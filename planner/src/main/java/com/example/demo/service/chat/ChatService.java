@@ -1,6 +1,7 @@
 package com.example.demo.service.chat;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,8 @@ public interface ChatService {
 	public Long roomCreate(String TalkerName, String me,Long SomeoneUserNum);
 
 	public List<ChattingRoom> talkList();
+
+	public Optional<ChattingRoom> findByRoomId(String roomId);
 
 			
 }
