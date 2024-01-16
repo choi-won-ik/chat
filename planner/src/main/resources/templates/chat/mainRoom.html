@@ -12,35 +12,31 @@
 <script th:inline="javascript">
 	let me = /*[[${me}]]*/"";
 	let talkList=/*[[${talkList}]]*/[];
+	
 </script>
-<script th:inline="javascript">
+<script>
 	window.onload=()=>{
-		// db에서 chattingRoom 가져오기
-		talkList.forEach((index)=>{
-			link=()=>{
-				window.location.href = "http://localhost:8080/chat/room?roomId="+index.roomId;
-//				window.location.href = "http://localhost:8080/chat/room/"+index.roomId;
-				
-				
-			};
-			
-			if(index.user1!==me){
+		// 좌측 유저리스트 중 유저명
+		
+		// db에서 chattingRoom List 가져오기
+		for(let i=0; i<talkList.length; i++){
+			if(talkList.user1!==me){
 				let str = "<li class='chattingPerson' id='chattingPerson' onclick='link()'>";
 					str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 					str += "<label id='deleteTag'>";
-					str += "<h2 id='talkUserName'>"+index.user1+"</h2>";
+					str += "<h2 id='talkUserName'>"+talkList[i].user1+"</h2>";
 					str += "<h3>대화내용</h3></label></li>";
-					$('.chattingList').append(str);
-			}else{
-				let str = "<li class='chattingPerson' id='chattingPerson' onclick='link()'>";
-					str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
-					str += "<label id='deleteTag'>";
-					str += "<h2 id='talkUserName'>"+index.user2+"</h2>";
-					str += "<h3>대화내용</h3></label></li>";
-					$('.chattingList').append(str);
+				$('.chattingList').append(str);
 			}
-			
-		});
+			else{
+				let str = "<li class='chattingPerson' id='chattingPerson' onclick='link()'>";
+					str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+					str += "<label id='deleteTag'>";
+					str += "<h2 id='talkUserName'>"+talkList[i].user2+"</h2>";
+					str += "<h3>대화내용</h3></label></li>";
+				$('.chattingList').append(str);
+			}
+		}
 	};
 </script>
 <script>
@@ -56,10 +52,13 @@ $(document).ready(()=>{
 	const $chattingList=document.getElementById('chattingList');
 	// 좌측 유저리스트
 	const $chattingPerson = document.querySelectorAll('.chattingPerson');
-	// 좌측 유저리스트 중 유저명
-	const $talkUserName = document.querySelectorAll('#talkUserName');
+
 	// 모달 폼
 	const formModal = document.getElementById('modal');
+	
+	// 좌측 talkList 관리 함수
+	console.log($chattingPerson.length);
+	
 	
 	// 모달 열기
 	$(document).on('click', '#add-btn',()=>{
@@ -118,20 +117,10 @@ $(document).ready(()=>{
 
 		};
 		
-		// 유저리스트 함수 적용
+		// 유저리스트 입력 시 이벤트 발생
 		$inputBox.addEventListener('input',inputBoxFunction);
 		
-		let chattingUserArray= [];
-		
-		let ArraySuccess ;
-		ArrayPush=(element)=>{
-			if(chattingUserArray.indexOf(element)===-1){
-				chattingUserArray.push(element);
-				ArraySuccess = 1;
-			}else{
-				ArraySuccess = 0;
-			}
-		};
+
 		
 		
 		
@@ -184,15 +173,7 @@ $(document).ready(()=>{
 			});
 		};
 
-		// 유저 리스트 클릭 시
-		for(let i = 0; i<$chattingPerson.length; i++){	
-			$chattingPerson[i].addEventListener('click',()=>{
-				alert("유저리스트 클릭 함수");
-				console.log($talkUserName[i].innerHTML);
-			});	
-		}
-		
-		// 보내기 버튼을 눌렀을 때
+		// 보내기 버튼을 눌렀을 때 이벤트 발생
 		$modalSend.addEventListener('mousedown', sendFunction);
 
 		
@@ -305,5 +286,10 @@ $(document).ready(()=>{
         </div>
     </form>
 </body>
-
+<script>
+	const $talkUserName = document.querySelectorAll('#talkUserName');
+	
+	console.log($talkUserName.length);
+</script>
+	
 </html>

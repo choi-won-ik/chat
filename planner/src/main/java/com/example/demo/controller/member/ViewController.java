@@ -38,7 +38,6 @@ public class ViewController {
         return "view/join";
     }
 
-
     @GetMapping("/setting/admin")
     @AdminAuthorize
     public String adminSettingPage() {

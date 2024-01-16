@@ -5,15 +5,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Entity.chat.ChattingRoom;
-import com.example.demo.Entity.member.Member;
 import com.example.demo.dto.chat.ChattingRoomDTO;
-import com.example.demo.repository.chat.ChatRoomRepository2;
 import com.example.demo.repository.chat.ChatRepository;
 import com.example.demo.repository.chat.ChatRoomRepository;
 import com.example.demo.repository.member.MemberRepository;
@@ -29,17 +26,6 @@ public class ChatServiceImpl implements ChatService{
 	private ChatRepository kafkaRepository;
 	@Autowired
 	private MemberRepository memberRepository;
-
-
-	@Override
-	public ChattingRoomDTO findRoomById(Long roomId) {
-		return chatRoomRepository.findRoomById(roomId);
-	}
-
-	@Override
-	public List findAllRooms() {
-		return chatRoomRepository.findAllRooms();
-	}
 
 	@Override
 	public List MessagList() {
@@ -94,7 +80,12 @@ public class ChatServiceImpl implements ChatService{
 		return chatRoomRepository.findAll();
 	}
 	
-	public Optional<ChattingRoom> findByRoomId(String roomId) {
-		return chatRoomRepository.findByRoomId(roomId);
+	public ChattingRoomDTO findByRoomId(String roomId) {
+		String user1 = chatRoomRepository.findUser1ByRoomId(roomId);
+		String user2= chatRoomRepository.findUser2ByRoomId(roomId);
+		String time=chatRoomRepository.findTimeByRoomId(roomId);
+
+		ChattingRoomDTO room =new ChattingRoomDTO(roomId,user1,user2,time);
+		return room;
 	}
 }

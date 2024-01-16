@@ -11,13 +11,7 @@ import com.example.demo.dto.chat.ChattingRoomDTO;
 
 @Service
 public interface ChatService {
-	// 채팅방 개설
-	public ChattingRoomDTO createRoom(String name);
-
-	// 채팅방 방문
-	public ChattingRoomDTO findRoomById(Long roomId);
 	
-	public List findAllRooms();
 
 	public List UserList(String userid);
 
@@ -29,7 +23,7 @@ public interface ChatService {
 
 	public List<ChattingRoom> talkList();
 
-	public Optional<ChattingRoom> findByRoomId(String roomId);
+	public ChattingRoomDTO findByRoomId(String roomId);
 
 			
 }
