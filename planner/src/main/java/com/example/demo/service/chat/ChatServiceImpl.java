@@ -37,13 +37,13 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 	@Override
-	public Long Someone(String TalkerName) {
-		return memberRepository.findIdByUserid(TalkerName);
+	public Long Someone(String talkerName) {
+		return memberRepository.findIdByUserid(talkerName);
 	}
 
 	// 채팅방 링크 생성
 	@Override
-	public String roomCreate(String TalkerName, String me,Long SomeoneUserNum) {
+	public String roomCreate(String talkerName, String me,Long SomeoneUserNum) {
 		Long meNum = memberRepository.findIdByUserid(me);
 		String roomName;
 		String  user1;
@@ -54,12 +54,12 @@ public class ChatServiceImpl implements ChatService{
 		if(meNum>SomeoneUserNum) {
 			roomName = meNum+"&"+SomeoneUserNum;
 			user1 = me;
-			user2 = TalkerName;
+			user2 = talkerName;
 		}
 		// 내 고유 id가 생다 공유 id보다 작을 때
 		else {
 			roomName = SomeoneUserNum+"&"+meNum;
-			user1 = TalkerName;
+			user1 = talkerName;
 			user2 = me;
 		}
 		
@@ -81,6 +81,19 @@ public class ChatServiceImpl implements ChatService{
 	
 	public ChattingRoom findByRoomId(String roomId) {		
 		return chatRoomRepository.findByRoomId(roomId);
+	}
+
+	@Override
+	public String findRoomId(String talkerName, String me) {
+		long youNum= memberRepository.findIdByUserid(talkerName);
+		long meNum = memberRepository.findIdByUserid(me);
+		String roomId ;
+		if(youNum>meNum) {
+			roomId = youNum+"&"+meNum;
+		}else {
+			roomId = meNum+"&"+youNum;
+		}
+		return roomId;
 	}
 
 

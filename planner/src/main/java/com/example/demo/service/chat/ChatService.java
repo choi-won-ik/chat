@@ -14,13 +14,15 @@ public interface ChatService {
 	
 	public List<Member> UserList(String userid);
 
-	public Long Someone(String TalkerName);
+	public Long Someone(String talkerName);
 
-	public String roomCreate(String TalkerName, String me,Long SomeoneUserNum);
+	public String roomCreate(String talkerName, String me,Long SomeoneUserNum);
 
 	public List<ChattingRoom> talkList();
 
 	public ChattingRoom findByRoomId(String roomId);
+
+	String findRoomId(String talkerName, String me);
 
 
 

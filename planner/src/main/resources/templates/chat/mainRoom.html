@@ -8,7 +8,6 @@
 <link th:href="@{/css/chatting.css}" rel="stylesheet">
 <link th:href="@{/css/button.css}" rel="stylesheet">
 <link th:href="@{/css/modal.css}" rel="stylesheet">
-<!--<script th:src="@{/js/modal.js}"></script>-->
 <script th:inline="javascript">
 	let me = /*[[${me}]]*/"";
 	let talkList=/*[[${talkList}]]*/[];
@@ -24,24 +23,33 @@
 			// 대화 상대 이름 저장
 			if(index.user1!==me){
 				you=index.user1;
-			}else{
+			}
+			else{
 				you=index.user2;
 			}
 			
+			
+			
 			// 대화 list 정의
-			let str = "<li class='chattingPerson' id='chattingPerson'>";
+			let str = "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input type='hidden' name='talkerName' value='"+you+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+you+"</h2>";
-				str += "<h3>대화내용</h3></label></li>";
+				str += "<h3>대화내용</h3></label></button></form>";
 			$('.chattingList').append(str);
 			
 			const $chattingPerson = document.querySelectorAll('.chattingPesrson');
+			
+			
 		});
 	};
 </script>
 <script>
 $(document).ready(()=>{
+
+	
 	// 유저 검색 창
 	const $inputBox = document.querySelector('.input_box');
 	let UserInput = document.getElementById('input_box');
@@ -152,7 +160,7 @@ $(document).ready(()=>{
 			if(!$modalSend.classList.contains('save')){
 				$modalSend.classList.toggle('save');
 			}
-			let TalkerName = $inputBox.value;
+//			let talkerName = $inputBox.value;
 		};
 
 		// 보내기 버튼을 눌렀을 때 이벤트 발생
@@ -224,7 +232,6 @@ $(document).ready(()=>{
 			<ul class='chattingList' id='chattingList'></ul>
 				
 
-
 			
 		</aside>
 
@@ -249,7 +256,7 @@ $(document).ready(()=>{
 
 
 	<!-- 모달 -->
-	<form th:action="@{/chat/room}" method="post" class="modal" id="modal">
+	<form th:action="@{/chat/create}" method="post" class="modal" id="modal">
 		<div class="modal_body">
 			<div class="m_head">
 				<div class="modal_title">새로운 메시지</div>
@@ -257,7 +264,7 @@ $(document).ready(()=>{
 			</div>
 			<div class="m_body">
 				<div class="modal_label">받는 사람 : 
-					<input type="text" class="input_box" id="input_box" name="TalkerName" placeholder="search">
+					<input type="text" class="input_box" id="input_box" name="talkerName" placeholder="search">
 				</div>
 
 				<!--유저 리스트 검색-->

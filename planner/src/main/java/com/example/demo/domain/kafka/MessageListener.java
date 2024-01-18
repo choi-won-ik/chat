@@ -10,10 +10,11 @@ import com.example.demo.dto.chat.ChatMessageDTO;
 public class MessageListener {
 
 	@Autowired
-	SimpMessagingTemplate simpMessagingtemplate;
+	private SimpMessagingTemplate simpMessagingtemplate;
 
 	public void listen(ChatMessageDTO message) {
-		simpMessagingtemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);		// kafka로 보낸 메시지를 websocket으로 받아옴.
+		// kafka로 보낸 메시지를 websocket으로 받아옴.
+		simpMessagingtemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
 		System.out.println("WebSocket 작동 확인용!!!!!");
 	}
 }

@@ -8,17 +8,54 @@
 <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js}"></script>
 <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js}"></script>
 <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js}"></script>
-<script th:inline="javascript">			//roomName과 roomId를 var로 받아오는 스크립트
-	var roomName = /*[[${user1}]]*/ "";
-	var roomId = /*[[${roomId}]]*/ "";
+<script th:inline="javascript">			//대화상대와 roomId를 var로 받아오는 스크립트
+	let talkerName = /*[[${talkerName}]]*/ "";
+	let roomId = /*[[${roomId}]]*/ "";
+	let me = sessionStorage.getItem('userid');
+	let talkList=/*[[${talkList}]]*/[];
+	let you;
+</script>
+
+<script>
+	window.onload=()=>{
+		// 좌측 유저리스트 중 유저명
+		
+		// db에서 chattingRoom List 가져오기
+		talkList.forEach((index)=>{
+			
+			// 대화 상대 이름 저장
+			if(index.user1!==me){
+				you=index.user1;
+			}
+			else{
+				you=index.user2;
+			}
+			
+			
+			
+			// 대화 list 정의
+			let str = "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input type='hidden' name='talkerName' value='"+you+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+you+"</h2>";
+				str += "<h3>대화내용</h3></label></button></form>";
+			$('.chattingList').append(str);
+			
+			const $chattingPerson = document.querySelectorAll('.chattingPesrson');
+			
+			
+		});
+	};
 </script>
 
 <script>
 $(document).ready(()=>{
 	
-    var username = sessionStorage.getItem('userid');    
+    
 
-    console.log(roomName + ", " + roomId + ", " + username);
+    console.log(talkerName + ", " + roomId + ", " + me);
 
     var sockJs = new SockJS("/ws-stomp");
     //1. SockJS를 내부에 들고있는 stomp를 내어줌
@@ -30,7 +67,7 @@ $(document).ready(()=>{
 		url:"/chat/MessageList",
 		success:(response)=>{
 			response.forEach(item=>{
-				if(item.writer===username){
+				if(item.writer===me){
 					str = "<li class='me'>";
 					str += "<div class='entete'>";
 					str += "<h2>"+item.writer+"</h2></div>";
@@ -70,7 +107,7 @@ $(document).ready(()=>{
 			if(message===''){
 				return;
 			}else{
-				if(writer === username){
+				if(writer === me){
 					str = "<li class='me'>";
 					str += "<div class='entete'>";
 					str += "<h2>"+writer+"</h2></div>";
@@ -97,11 +134,11 @@ $(document).ready(()=>{
 	$("#button-send").on("click", (e)=>{
         var msg = document.getElementById("msg");
 
-        console.log(username + ":" + msg.value);
+        console.log(me + ":" + msg.value);
         stomp.send(
 				'/pub/chat/message',
 				{},
-				JSON.stringify({roomId: roomId, message: msg.value, writer: username})
+				JSON.stringify({roomId: roomId, message: msg.value, writer: me})
         	);
         msg.value = '';
     });
@@ -112,11 +149,11 @@ $(document).ready(()=>{
 			e.preventDefault();
 			var msg = document.getElementById("msg");
 
-			console.log(username + ":" + msg.value);
+			console.log(me + ":" + msg.value);
 			stomp.send(
 				'/pub/chat/message', 
 				{}, 
-				JSON.stringify({roomId: roomId, message: msg.value, writer: username})
+				JSON.stringify({roomId: roomId, message: msg.value, writer: me})
 			);
 			msg.value = '';
 
@@ -156,32 +193,17 @@ for(let i=0; i<$chattingPerson.length; i++){
 				<div id="userPlusButton"></div>
 				<input type="text" id="searchUser" placeholder="search">
 			</header>
-
-			<ul id="chattingList">
-            <!-- 비 접송 중 -->
-				<li class="chattingPerson">
-					<img src="/img/chat/user.png" alt="">
-					<label>
-						<h2>userName</h2>
-						<h3>대화내용</h3>
-					</label>
-				</li>
-            <!-- 접속 중 -->
-				<li class="chattingPerson">
-					<img src="/img/chat/user.png" alt="">
-					<label>
-						<h2>userName</h2>
-						<h3>대화내용</h3>
-					</label>
-				</li>
-			</ul>
+			
+			<!-- 왼쪽 대화상대 창 -->
+			<ul class='chattingList' id='chattingList'></ul>
+			
 		</aside>
 
 		<main>
 			<header>
 				<img src="/img/chat/user.png" alt="">
 				<div>
-					<h2>test</h2>
+					<h2 th:text="${talkerName}"></h2>
 				</div>
 			</header>
 

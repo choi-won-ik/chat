@@ -20,8 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	// 유저명으로 해당 id값 불러옴
 //	Long findIdByUserid(String SomeoneName);
 	@Query(
-			value= "SELECT id from member u WHERE userid = :TalkerName",
+			value= "SELECT id from member u WHERE userid = :talkerName",
 			nativeQuery  = true
 			)
-	Long findIdByUserid(@Param("TalkerName") String TalkerName);
+	Long findIdByUserid(@Param("talkerName") String talkerName);
 }
