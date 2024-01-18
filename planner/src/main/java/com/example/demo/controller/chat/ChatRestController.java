@@ -7,16 +7,18 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 
+import com.example.demo.Entity.chat.Chat;
+import com.example.demo.Entity.member.Member;
 import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.dto.chat.ChatMessageDTO;
 import com.example.demo.service.chat.ChatService;
@@ -43,38 +45,19 @@ public class ChatRestController {
 	}
 
 	@PostMapping("/MessageList")				//JPA에서 findAll()을 사용하여 message정보를 db에서 불러옴
-	public List MessageList() {
+	public List<Chat> MessageList() {
 		System.out.println("메시지 확인용!!!!!!");
-		List MsgList = chatService.MessagList();
+		List<Chat> MsgList = chatService.MessagList();
 		return MsgList;
 	}
 	
 	@PostMapping("/UserList")
-	public List UserList(@RequestParam("userid") String userid) {
-		System.out.println("매우매우 이상암");
+	public List<Member> UserList(@RequestParam("userid") String userid) {
 //		List<String> UserName = new ArrayList<>();
 //		UserName.add(UserList);
-		System.out.println(userid);
-		List UserName = chatService.UserList(userid);
+		List<Member> UserName = chatService.UserList(userid);
 		return UserName;
 	}
 	
-	@PostMapping("/TalkerName")
-	public Long Someone(@RequestParam("TalkerName") String TalkerName,@RequestParam("me") String me, Model model) {
-		System.out.println(TalkerName);
-		System.out.println(me);
-		Long SomeoneUserNum = chatService.Someone(TalkerName);
-		System.out.println("여기까지 성공!!!!!!!!!!");
 
-		chatService.roomCreate(TalkerName,me,SomeoneUserNum);
-		System.out.println(SomeoneUserNum);
-		return SomeoneUserNum;
-	}
-	
-	// 채팅창 개설
-	@PostMapping(value = "/create")
-    public String create(@RequestParam String me, RedirectAttributes rttr, Model model){
-		model.addAttribute("talkList", chatService.talkList());
-		return "redirect:/chat/main";
-    }
 }

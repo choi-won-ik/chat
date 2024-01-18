@@ -12,31 +12,32 @@
 <script th:inline="javascript">
 	let me = /*[[${me}]]*/"";
 	let talkList=/*[[${talkList}]]*/[];
-	
+	let you;
 </script>
 <script>
 	window.onload=()=>{
 		// 좌측 유저리스트 중 유저명
 		
 		// db에서 chattingRoom List 가져오기
-		for(let i=0; i<talkList.length; i++){
-			if(talkList.user1!==me){
-				let str = "<li class='chattingPerson' id='chattingPerson' onclick='link()'>";
-					str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
-					str += "<label id='deleteTag'>";
-					str += "<h2 id='talkUserName'>"+talkList[i].user1+"</h2>";
-					str += "<h3>대화내용</h3></label></li>";
-				$('.chattingList').append(str);
+		talkList.forEach((index)=>{
+			
+			// 대화 상대 이름 저장
+			if(index.user1!==me){
+				you=index.user1;
+			}else{
+				you=index.user2;
 			}
-			else{
-				let str = "<li class='chattingPerson' id='chattingPerson' onclick='link()'>";
-					str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
-					str += "<label id='deleteTag'>";
-					str += "<h2 id='talkUserName'>"+talkList[i].user2+"</h2>";
-					str += "<h3>대화내용</h3></label></li>";
-				$('.chattingList').append(str);
-			}
-		}
+			
+			// 대화 list 정의
+			let str = "<li class='chattingPerson' id='chattingPerson'>";
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+you+"</h2>";
+				str += "<h3>대화내용</h3></label></li>";
+			$('.chattingList').append(str);
+			
+			const $chattingPerson = document.querySelectorAll('.chattingPesrson');
+		});
 	};
 </script>
 <script>
@@ -52,12 +53,28 @@ $(document).ready(()=>{
 	const $chattingList=document.getElementById('chattingList');
 	// 좌측 유저리스트
 	const $chattingPerson = document.querySelectorAll('.chattingPerson');
-
 	// 모달 폼
 	const formModal = document.getElementById('modal');
 	
-	// 좌측 talkList 관리 함수
-	console.log($chattingPerson.length);
+	// 좌측 채팅리스트로 채팅방 방문
+	for(let i=0; i<$chattingPerson.length; i++){
+		$chattingPerson[i].addEventListener('click',()=>{
+			console.log(talkList[i].roomId);
+			$.ajax({
+				type:'GET',
+				dataType:'JSON',
+				data:({roomId:talkList[i].roomId}),
+				url:"/chat/room",
+				success:(result)=>{
+					console.log(result);
+				},
+				error:(error)=>{
+					alert("실패");
+				}
+			});
+			
+		});
+	}
 	
 	
 	// 모달 열기
@@ -114,7 +131,6 @@ $(document).ready(()=>{
 					},
 				})
 			}
-
 		};
 		
 		// 유저리스트 입력 시 이벤트 발생
@@ -131,46 +147,12 @@ $(document).ready(()=>{
 				$modalSend.removeEventListener('mousedown', sendFunction);
 			}
 			
-			// 폼 비동작 함수
-			formMove=(event)=>{
-				event.preventDefault();
-				console.log("폼 제출 막음");
-			};
 
 			// 보내기 버튼 클릭 시 클릭 효과 추가
 			if(!$modalSend.classList.contains('save')){
 				$modalSend.classList.toggle('save');
 			}
 			let TalkerName = $inputBox.value;
-
-
-			
-			$.ajax({
-				type : 'POST',
-				url : "/chat/TalkerName",
-				dataType :"JSON",
-				data:({
-					TalkerName:TalkerName,
-					me:me	
-				}),
-				success:(response)=>{
-					let str = "<li class='chattingPerson' id='chattingPerson'>";
-						str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
-						str += "<label id='deleteTag'>";
-						str += "<h2 id='talkUserName'>"+TalkerName+"</h2>";
-						str += "<h3>대화내용</h3></label></li>";
-						$('.chattingList').append(str);	
-						
-						
-					formModal.removeEventListener('submit', formMove);
-
-						
-					formModal.submit;
-				},
-				error:()=>{
-					alert("없는 유저입니다.");
-				}
-			});
 		};
 
 		// 보내기 버튼을 눌렀을 때 이벤트 발생
@@ -267,7 +249,7 @@ $(document).ready(()=>{
 
 
 	<!-- 모달 -->
-	<form th:action="@{/chat/create}" method="post" class="modal" id="modal">
+	<form th:action="@{/chat/room}" method="post" class="modal" id="modal">
 		<div class="modal_body">
 			<div class="m_head">
 				<div class="modal_title">새로운 메시지</div>
@@ -275,7 +257,7 @@ $(document).ready(()=>{
 			</div>
 			<div class="m_body">
 				<div class="modal_label">받는 사람 : 
-					<input type="text" class="input_box" id="input_box" name="me" placeholder=" search">
+					<input type="text" class="input_box" id="input_box" name="TalkerName" placeholder="search">
 				</div>
 
 				<!--유저 리스트 검색-->
@@ -286,10 +268,5 @@ $(document).ready(()=>{
         </div>
     </form>
 </body>
-<script>
-	const $talkUserName = document.querySelectorAll('#talkUserName');
-	
-	console.log($talkUserName.length);
-</script>
 	
 </html>

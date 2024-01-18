@@ -9,8 +9,8 @@
 <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js}"></script>
 <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js}"></script>
 <script th:inline="javascript">			//roomName과 roomId를 var로 받아오는 스크립트
-	var roomName = /*[[${room.user1}]]*/ "";
-	var roomId = /*[[${room.roomId}]]*/ "";
+	var roomName = /*[[${user1}]]*/ "";
+	var roomId = /*[[${roomId}]]*/ "";
 </script>
 
 <script>

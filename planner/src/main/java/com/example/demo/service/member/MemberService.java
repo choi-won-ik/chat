@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.example.demo.Entity.member.Member;
 import com.example.demo.repository.member.MemberRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,6 +29,4 @@ public class MemberService {
         }
         return false;
     }
-
-
 }
