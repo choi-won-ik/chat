@@ -7,6 +7,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +22,8 @@ import com.example.demo.Entity.member.Member;
 import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.dto.chat.ChatMessageDTO;
 import com.example.demo.service.chat.ChatService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @CrossOrigin
 @RestController
@@ -51,10 +56,17 @@ public class ChatRestController {
 	}
 	
 	@PostMapping("/UserList")
-	public List<Member> UserList(@RequestParam("userid") String userid) {
-//		List<String> UserName = new ArrayList<>();
-//		UserName.add(UserList);
-		List<Member> UserName = chatService.UserList(userid);
-		return UserName;
+	public List<Member> UserList(@RequestParam("userid") String userid,Model model,HttpServletRequest request) {
+		// security에 접속되어 있는 내 아이디
+//		String me = (String) model.getAttribute("me");
+		String me = (String)request.getAttribute("me");
+		
+		System.out.println("TestTestTestTestTestTestTestTestTestTest");
+		System.out.println(me);
+		System.out.println("TestTestTestTestTestTestTestTestTestTest");
+		
+		List<Member> userName = chatService.UserList(userid,me);
+		
+		return userName;
 	}
 }

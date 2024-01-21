@@ -11,7 +11,6 @@
 <script th:inline="javascript">
 	let me = /*[[${me}]]*/"";
 	let talkList=/*[[${talkList}]]*/[];
-	let you;
 </script>
 <script>
 	window.onload=()=>{
@@ -21,13 +20,12 @@
 		talkList.forEach((index)=>{
 			
 			// 대화 상대 이름 저장
-			if(index.user1!==me){
+			if(index.user!==me){
 				you=index.user1;
 			}
 			else{
 				you=index.user2;
 			}
-			
 			
 			
 			// 대화 list 정의

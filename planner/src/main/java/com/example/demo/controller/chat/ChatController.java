@@ -1,63 +1,65 @@
 package com.example.demo.controller.chat;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.Entity.chat.ChattingRoom;
 import com.example.demo.service.chat.ChatService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value = "/chat")
 public class ChatController {
 	@Autowired
 	private ChatService chatService;
-
+	
+	
+	// 채팅 main Page 실행
 	@GetMapping("/main")
-	public String main(Model model) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String userid = authentication.getName();
-		model.addAttribute("me", userid);
-		model.addAttribute("talkList", chatService.talkList());
+	public String main(Model model,HttpServletRequest request) {
+		 String me = (String)request.getAttribute("me");
+		model.addAttribute("me", me);
+		List<ChattingRoom> talkList = chatService.talkList(me);
+		model.addAttribute("talkList", talkList);
+		System.out.println(talkList);
 		return "/chat/mainRoom";
 	}
 
 	// 채팅창 개설
 	@PostMapping("/create")
-	public String Someone(@RequestParam("talkerName")String talkerName,RedirectAttributes rttr) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String me = authentication.getName();
+	public String Someone(@RequestParam("talkerName")String talkerName,HttpServletRequest request) {
+		String me = (String)request.getAttribute("me");
 		Long SomeoneUserNum = chatService.Someone(talkerName);
 		System.out.println("여기까지 성공!!!!!!!!!!");
 		
-		rttr.addFlashAttribute("talkerName",talkerName);
 		String roomId = chatService.roomCreate(talkerName,me,SomeoneUserNum);
-		rttr.addFlashAttribute("roomId",roomId);
-		return "redirect:/chat/room?roomId="+roomId;
+		
+		return "redirect:/chat/room/{"+roomId+"}";
 	}
 
 	//채팅방 방문
 	@PostMapping("/visit")
-	public String visit(@RequestParam("talkerName")String talkerName,RedirectAttributes rttr) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String me = authentication.getName();
-		rttr.addFlashAttribute("talkerName", talkerName);
+	public String visit(@RequestParam("talkerName")String talkerName,HttpServletRequest request) {
+		String me = (String)request.getAttribute("me");
 		String roomId=chatService.findRoomId(talkerName,me);
-		rttr.addFlashAttribute("roomId", roomId);
-
 		System.out.println("TestTestTestTestTest");
 
 		System.out.println("TestTestTestTestTest");
 
-		return "redirect:/chat/room?roomId="+roomId;
+		return "redirect:/chat/room/"+roomId;
 	}
 
-	@GetMapping("/room")
-	public String room(Model model) {
-		model.addAttribute("talkList", chatService.talkList());
+	@GetMapping("/room/{roomId}")
+	public String room(@PathVariable("roomId") String roomId,Model model,HttpServletRequest request) {
+		String me = (String)request.getAttribute("me");
+		model.addAttribute("talkList", chatService.talkList(me));
+		model.addAttribute("roomId",roomId);
+
 		return "chat/room";
 	}
 

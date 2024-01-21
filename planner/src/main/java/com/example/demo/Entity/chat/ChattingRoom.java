@@ -22,13 +22,12 @@ public class ChattingRoom {
 	// 채팅방의 코드 ex)3+2
 	private String roomId;
 	
-	private String user1;
-	
-	private String user2;
+	private String user;
+
 	
 	private String time;
 	
-	public static ChattingRoom createRoom(String roomId,String user1,String user2 , String time) {
-		return new ChattingRoom(null, roomId, user1, user2, time);
+	public static ChattingRoom createRoom(String roomId,String user, String time) {
+		return new ChattingRoom(null, roomId, user, time);
 	}
 }

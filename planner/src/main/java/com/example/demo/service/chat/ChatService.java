@@ -12,15 +12,14 @@ import com.example.demo.Entity.member.Member;
 public interface ChatService {
 	List<Chat> MessagList();
 	
-	public List<Member> UserList(String userid);
+	public List<Member> UserList(String userid,String me);
 
 	public Long Someone(String talkerName);
 
 	public String roomCreate(String talkerName, String me,Long SomeoneUserNum);
 
-	public List<ChattingRoom> talkList();
+	List<ChattingRoom> talkList(String me);
 
-	public ChattingRoom findByRoomId(String roomId);
 
 	String findRoomId(String talkerName, String me);
 
