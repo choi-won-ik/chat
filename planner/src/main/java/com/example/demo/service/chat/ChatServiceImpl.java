@@ -3,8 +3,10 @@ package com.example.demo.service.chat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,14 +31,17 @@ public class ChatServiceImpl implements ChatService{
 	private MemberRepository memberRepository;
 
 	@Override
-	public List<Chat> MessagList() {
-		return kafkaRepository.findAll();
+	public List<Chat> MessagList(String roomId) {
+		return kafkaRepository.findByRoomId(roomId);
 	}
 
+	// 모달에 있는 userList에서 내 이름만 제외
 	@Override
-	public List<Member> UserList(String userid,String me) {
-		List<Member> UserList=memberRepository.findByUseridStartingWith(userid);
-
+	public CopyOnWriteArrayList<Member> UserList(String userid,String me) {
+		// ConcurrentModificationException예외를 처리하기 위해 concurrent사용
+		CopyOnWriteArrayList<Member> UserList=memberRepository.findByUseridStartingWith(userid);
+		
+		// UserList에서 내 이름만 제외
 		for (Member member : UserList) {
 			if(member.getUserid().equals(me)) {
 				UserList.remove(member);
@@ -46,6 +51,10 @@ public class ChatServiceImpl implements ChatService{
 		return UserList;
 	}
 
+	
+	
+	
+	
 	@Override
 	public Long Someone(String talkerName) {
 		return memberRepository.findIdByUserid(talkerName);
@@ -82,27 +91,39 @@ public class ChatServiceImpl implements ChatService{
 		
 		return chattingRoom.getRoomId();
 	}
+	
+	
+	
+	
+	
 
 	// 모든 채팅방 List를 db에서 불러옴
-	public List<ChattingRoom> talkList(String me){
+	public CopyOnWriteArrayList<ChattingRoom> talkList(String me){
 		
-		// 내가 포함되어 있는 모든 roomId 색출
-		List<ChattingRoom> roomId =chatRoomRepository.findRooIdByUser(me);
-		List<ChattingRoom> talkList= new ArrayList<>();
+		// 내가 포함되어 있는 모든 roomId 색출, 중복된 roomId 제거
+		List<String> roomIdList = chatRoomRepository.findRooIdByUser(me);
+		Set<String> set = new HashSet<>(roomIdList);
+		List<String>roomId = new ArrayList<>(set);
 		
-		// 색출된 roomId로 상대가 있는 필드도 추가
-		for (ChattingRoom chattingRoom : roomId) {
-			talkList.add(chatRoomRepository.findByRoomId(chattingRoom));
-		}
+		CopyOnWriteArrayList<ChattingRoom> talkList =  new CopyOnWriteArrayList<>(chatRoomRepository.findAll());
 		
-		// 검색한 채팅방 중에서 user가 내 id면 제외한다.
+		// 해당 roomId에 해당하는 chattingRoom내용을 리스트에 담음
 		for (ChattingRoom chattingRoom : talkList) {
+			for (String str : roomId) {
+				if(!chattingRoom.getRoomId().equals(str)) {
+					talkList.remove(chattingRoom);
+				}
+			}
 			if(chattingRoom.getUser().equals(me)) {
 				talkList.remove(chattingRoom);
 			}
 		}
+
 		return talkList;
 	}
+	
+
+	
 	
 
 	@Override
@@ -116,6 +137,16 @@ public class ChatServiceImpl implements ChatService{
 			roomId = meNum+"&"+youNum;
 		}
 		return roomId;
+	}
+
+	@Override
+	public String roomTalkerName(String me, String roomId) {
+		// 상대방 고유 id 추출
+		roomId = roomId.replace("&", "");
+		roomId = roomId.replace(String.valueOf(memberRepository.findIdByUserid(me)), "");
+		long talkerName = Long.parseLong(roomId);
+		
+		return memberRepository.findUserById(talkerName);
 	}
 
 

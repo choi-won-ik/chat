@@ -9,13 +9,14 @@ import com.example.demo.Entity.member.Member;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 	// 유저명 찾기
     Optional<Member> findByUserid(String userId);
 
     // 입력값으로 시작하는 유저명 불러옴
-	List<Member> findByUseridStartingWith(String userid);
+    CopyOnWriteArrayList<Member> findByUseridStartingWith(String userid);
 	
 	// 유저명으로 해당 id값 불러옴
 //	Long findIdByUserid(String SomeoneName);
@@ -24,4 +25,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 			nativeQuery  = true
 			)
 	Long findIdByUserid(@Param("talkerName") String talkerName);
+
+	@Query(
+			value= "SELECT userid from member WHERE id = :talkerName",
+			nativeQuery  = true
+			)
+	String findUserById(@Param("talkerName") long talkerName);
 }

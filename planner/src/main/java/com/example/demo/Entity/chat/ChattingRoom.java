@@ -24,7 +24,6 @@ public class ChattingRoom {
 	
 	private String user;
 
-	
 	private String time;
 	
 	public static ChattingRoom createRoom(String roomId,String user, String time) {

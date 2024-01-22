@@ -13,7 +13,7 @@
 	let roomId = /*[[${roomId}]]*/ "";
 	let me = sessionStorage.getItem('userid');
 	let talkList=/*[[${talkList}]]*/[];
-	let you;
+	let messageList = /*[[${MsgList}]]*/[];
 </script>
 
 <script>
@@ -22,29 +22,40 @@
 		
 		// db에서 chattingRoom List 가져오기
 		talkList.forEach((index)=>{
-			
-			// 대화 상대 이름 저장
-			if(index.user1!==me){
-				you=index.user1;
-			}
-			else{
-				you=index.user2;
-			}
-			
-			
-			
 			// 대화 list 정의
 			let str = "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
-				str += "<input type='hidden' name='talkerName' value='"+you+"'>"
+				str += "<input type='hidden' name='talkerName' value='"+index.user+"'>"
 				str +="<button id='chattingListBTN' type='submit'>"
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
-				str += "<h2 id='talkUserName'>"+you+"</h2>";
+				str += "<h2 id='talkUserName'>"+index.user+"</h2>";
 				str += "<h3>대화내용</h3></label></button></form>";
 			$('.chattingList').append(str);
 			
 			const $chattingPerson = document.querySelectorAll('.chattingPesrson');
-			
+		});	
+
+		
+		messageList.forEach((index)=>{
+			if(index.writer===me){
+				let str = "<li class='me'>";
+					str += "<div class='entete'>";
+					str += "<h2>"+index.writer+"</h2></div>";
+					str += "<h3>"+index.timestamp+" </h3>";
+					str += "<div class='message'>";
+					str += "<b>" + index.message+ "</b>";
+					str += "</div></li>";
+				$("#chat").append(str);
+			}
+			else{
+				let str = "<li class='you'>";
+					str += "<div class='entete'>";
+					str += "<h2>"+index.writer+"</h2></div>";
+					str += "<div class='message'>";
+					str += "<b>" +index.message+ "</b></div>";
+					str += "<h3>"+index.timestamp+" </h3></li>";
+					$("#chat").append(str);
+			}
 			
 		});
 	};
@@ -53,57 +64,26 @@
 <script>
 $(document).ready(()=>{
 	
-    
+	console.log(talkerName + ", " + roomId + ", " + me);
 
-    console.log(talkerName + ", " + roomId + ", " + me);
+	let sockJs = new SockJS("/ws-stomp");
+	//1. SockJS를 내부에 들고있는 stomp를 내어줌
+	let stomp = Stomp.over(sockJs);
 
-    var sockJs = new SockJS("/ws-stomp");
-    //1. SockJS를 내부에 들고있는 stomp를 내어줌
-    var stomp = Stomp.over(sockJs);
-	
-	// db에서 채팅기록 불러옴
-	$.ajax({
-		type:"POST",
-		url:"/chat/MessageList",
-		success:(response)=>{
-			response.forEach(item=>{
-				if(item.writer===me){
-					str = "<li class='me'>";
-					str += "<div class='entete'>";
-					str += "<h2>"+item.writer+"</h2></div>";
-					str += "<h3>"+item.timestamp+" </h3>";
-					str += "<div class='message'>";
-					str += "<b>" + item.message+ "</b>";
-					str += "</div></li>";
-                   $("#chat").append(str);
-				}
-				else{
-					str = "<li class='you'>";
-					str += "<div class='entete'>";
-					str += "<h2>"+item.writer+"</h2></div>";
-					str += "<div class='message'>";
-					str += "<b>" + item.message+ "</b></div>";
-					str += "<h3>"+item.timestamp+" </h3></li>";
-					$("#chat").append(str);
-				}
-			});
-		},
-		error:(jqXHR, textStatus, errorThrown)=>{
-			console.log(jqXHR, textStatus, errorThrown);	
-		}
-	});
+
 
     //2. connection이 맺어지면 실행
 	stomp.connect({}, function (){
-       
+			console.log("실행중");
 		//4. subscribe(path, callback)으로 메세지를 받을 수 있음
 		stomp.subscribe("/sub/chat/room/"+roomId, (chat) => {
-			var content = JSON.parse(chat.body);
+			
+			let content = JSON.parse(chat.body);
 
-			var writer = content.writer;
-			var str = '';
-			var message = content.message;
-			var timestamp = content.timestamp;
+			let writer = content.writer;
+			let str = '';
+			let message = content.message;
+			let timestamp = content.timestamp;
 			if(message===''){
 				return;
 			}else{
@@ -129,27 +109,28 @@ $(document).ready(()=>{
 			}  
 		});
 	});
-   
+
 	// 버튼 클릭 시 메시지 보내기
 	$("#button-send").on("click", (e)=>{
-        var msg = document.getElementById("msg");
+		let msg = document.getElementById("msg");
 
-        console.log(me + ":" + msg.value);
-        stomp.send(
+		console.log(me + ":" + msg.value);
+		stomp.send(
 				'/pub/chat/message',
 				{},
 				JSON.stringify({roomId: roomId, message: msg.value, writer: me})
-        	);
-        msg.value = '';
-    });
-    
-    // ENTER키 눌렀을 때 메시지 보내기
+			);
+		msg.value = '';
+	});
+
+	// ENTER키 눌렀을 때 메시지 보내기
 	$("#msg").on("keydown", (e)=>{
 		if (e.key === "Enter") {
 			e.preventDefault();
-			var msg = document.getElementById("msg");
+			let msg = document.getElementById("msg");
 
 			console.log(me + ":" + msg.value);
+			console.log(roomId);
 			stomp.send(
 				'/pub/chat/message', 
 				{}, 
@@ -163,27 +144,6 @@ $(document).ready(()=>{
 });
 </script>
 
-<script>
-let $chattingPerson = document.querySelectorAll(".chattingPerson");
-
-for(let i=0; i<$chattingPerson.length; i++){
-	$chattingPerson[i].addEventListener('click',()=>{
-		console.log("이호원 병신");
-	});
-}
-</script>
-
-<script>
-	$(document).ready(()=>{
-		const $chattingPerson = document.querySelectorAll('.chattingPerson');
-
-		for (let i = 0; i < $chattingPerson.length; i++) {
-			$chattingPerson[i].addEventListener('click',()=>{
-				console.log("test test test test");
-			});
-		}
-	});
-</script>
 
 <body>
 	<div class="chat_container" style="background-color: #eff3f7;">
