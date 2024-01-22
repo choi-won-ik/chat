@@ -53,8 +53,6 @@ public class ChatServiceImpl implements ChatService{
 
 	
 	
-	
-	
 	@Override
 	public Long Someone(String talkerName) {
 		return memberRepository.findIdByUserid(talkerName);
