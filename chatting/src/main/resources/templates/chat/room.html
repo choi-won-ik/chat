@@ -14,6 +14,7 @@
 	let me = sessionStorage.getItem('userid');
 	let talkList=/*[[${talkList}]]*/[];
 	let messageList = /*[[${MsgList}]]*/[];
+	
 </script>
 
 <script>
@@ -59,10 +60,20 @@
 			
 		});
 	};
+	
+	window.onunload=()=>{
+		// 좌측 유저명 검색 input
+		let $searchUser = document.getElementById("searchUser");
+		
+		$searchUser.removeEventListener('input', inputEvent);
+	};
+	
 </script>
 
 <script>
 $(document).ready(()=>{
+	// 좌측 유저명 검색 input
+	let $searchUser = document.getElementById("searchUser");
 	
 	console.log(talkerName + ", " + roomId + ", " + me);
 
@@ -140,9 +151,44 @@ $(document).ready(()=>{
 
 			return false;
 		}
-	}); 
+	});
+	
+	
+	
+	inputEvent=()=>{
+		$UserListDrop=document.getElementById("UserListDrop");
+		
+		$UserListDrop.innerHTML="";
+		if($UserListDrop.innerHTML.trim()===""){
+			let UserList = $searchUser.value;
+			console.log(UserList);
+			$.ajax({
+				type : 'POST',
+				url : "/chat/UserList",
+				dataType : "JSON",
+				data : ({
+					userid : UserList
+				}),
+				success:(response)=>{
+					response.forEach(item=>{
+						let str = "<button class='UserList'>"+item.userid+"</button>";
+						$("#UserListDrop").append(str);
+					});
+				},
+				error :(request, status, error)=>{
+					console.log(error);
+				}
+			})
+		}
+		
+	};
+	
+	$searchUser.addEventListener('input', inputEvent);
+	
+	 
 });
 </script>
+
 
 
 <body>
@@ -152,6 +198,7 @@ $(document).ready(()=>{
 			<header>
 				<div id="userPlusButton"></div>
 				<input type="text" id="searchUser" placeholder="search">
+				<div class="UserListDrop" id="UserListDrop">
 			</header>
 			
 			<!-- 왼쪽 대화상대 창 -->
@@ -185,28 +232,5 @@ $(document).ready(()=>{
 	</div>
 </body>
 
-<script type="text/javascript">
-$(document).ready(()=>{
-	var $searchUser = document.getElementById("searchUser");
-	
-	$searchUser.addEventListener('input', ()=>{
-		var UserList = $searchUser.value;
-		console.log(UserList);
-		$.ajax({
-			type : 'POST',
-			url : "/UserList",
-			dataType : "JSON",
-			data : ({
-				userid : UserList
-			}),
-			success:(response)=>{
-				console.log(response);
-			},
-			error :(request, status, error)=>{
-				console.log(error);
-			}
-		})
-	});
-});
-</script>
+
 </html>

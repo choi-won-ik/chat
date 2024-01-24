@@ -25,7 +25,7 @@ public class SpringSecurityConfig {
         http.csrf().disable().cors().disable()								// 이 부분은 다시 설정 필요
                 .authorizeHttpRequests(request -> request
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .requestMatchers("/status", "/images/**", "/view/join", "/auth/join","/test/**").permitAll()
+                        .requestMatchers("/status", "/images/**", "/view/join", "/auth/join").permitAll()
                         .anyRequest().authenticated()						// 어떠한 요청이라도 인증필요
                 )
                 .formLogin(login -> login									// form 방식 로그인 사용

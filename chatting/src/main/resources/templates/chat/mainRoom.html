@@ -35,6 +35,21 @@
 			
 		});
 	};
+	
+	window.onunload=()=>{
+		const $inputBox = document.querySelector('.input_box');
+		let $ModalUserList = document.getElementById('ModalUserList');
+		if($ModalUserList){
+			// 모달에 발생된 이벤트 종료
+			$inputBox.removeEventListener('input',inputBoxFunction);
+			// 모달에 있는 userList를 제거
+			while ($ModalUserList.firstChild) {
+				$ModalUserList.removeChild($ModalUserList.firstChild);
+			}
+		}
+		$inputBox.value="";
+	};
+
 </script>
 <script>
 $(document).ready(()=>{
@@ -88,9 +103,10 @@ $(document).ready(()=>{
 		inputBoxFunction=()=>{
 			// 입력 시 이전에 검색했던 UserList 모두 삭제
 			$ModalUserList.innerHTML="";
+
 			
-			let UserList = UserInput.value;
-			if($ModalUserList.innerHTML===""){
+			if($ModalUserList.innerHTML.trim()===""){
+				let UserList = UserInput.value;
 				$.ajax({
 					type : 'POST',
 					url : "/chat/UserList",

@@ -29,7 +29,10 @@ public class ChatController {
 		model.addAttribute("me", me);
 		
 		// main하면 좌측에 있는 채팅리스트
-		CopyOnWriteArrayList<ChattingRoom> talkList = chatService.talkList(me);
+		List<ChattingRoom> talkList = chatService.talkList(me);
+		for (ChattingRoom test : talkList) {
+			System.out.println(test);
+		}
 		model.addAttribute("talkList", talkList);
 		return "/chat/mainRoom";
 	}
@@ -43,7 +46,7 @@ public class ChatController {
 		
 		String roomId = chatService.roomCreate(talkerName,me,SomeoneUserNum);
 		
-		return "redirect:/chat/room/{"+roomId+"}";
+		return "redirect:/chat/room/"+roomId;
 	}
 
 	//채팅방 방문

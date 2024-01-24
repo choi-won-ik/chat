@@ -19,13 +19,10 @@ public interface ChatService {
 
 	public String roomCreate(String talkerName, String me,Long SomeoneUserNum);
 
-	CopyOnWriteArrayList<ChattingRoom> talkList(String me);
+	List<ChattingRoom> talkList(String me);
 
 	String findRoomId(String talkerName, String me);
 
 	String roomTalkerName(String me, String roomId);
-
-
-
 			
 }

@@ -15,5 +15,10 @@ public interface ChatRoomRepository extends JpaRepository<ChattingRoom, Long>{
 			value= "SELECT room_id from chattingroom WHERE user = :me",
 			nativeQuery  = true
 			)
-	List<String> findRooIdByUser(@Param("me") String me);
+	List<String> findRoomIdByUser(@Param("me") String me);
+//	List<String> findRoomIdbyUser(String me);
+
+	CopyOnWriteArrayList<ChattingRoom> findByUser(String me);
+
+	List<ChattingRoom> findByRoomId(@Param("roomId") String roomId);
 }

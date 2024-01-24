@@ -18,6 +18,7 @@ import com.example.demo.repository.chat.ChatRepository;
 import com.example.demo.repository.chat.ChatRoomRepository;
 import com.example.demo.repository.member.MemberRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -74,7 +75,6 @@ public class ChatServiceImpl implements ChatService{
 		// 내 고유 id가 생다 공유 id보다 작을 때
 		else {
 			roomId = SomeoneUserNum+"&"+meNum;
-
 		}
 		
 		// 방 생성 시 시간 관리
@@ -83,43 +83,50 @@ public class ChatServiceImpl implements ChatService{
 		
 		ChattingRoom chattingRoom=ChattingRoom.createRoom(roomId,me,time);
 		
-		// db에 내용 저장
-		chatRoomRepository.save(chattingRoom);
-		chatRoomRepository.save(ChattingRoom.createRoom(roomId,talkerName,time));
+		List<ChattingRoom> list=chatRoomRepository.findByRoomId(roomId);
+		if(list.isEmpty()) {
+			// db에 내용 저장
+			chatRoomRepository.save(chattingRoom);
+			chatRoomRepository.save(ChattingRoom.createRoom(roomId,talkerName,time));
+		}else {
+			update(list,time);
+		}
 		
 		return chattingRoom.getRoomId();
 	}
 	
-	
-	
+	// db에 해당 채팅 리스트가 있을 시 시간만 업대이트 시킴.
+	@Transactional
+	public void update(List<ChattingRoom> list,String time) {
+		for (ChattingRoom room : list) {
+			room.setTime(time);
+			
+			chatRoomRepository.save(room);
+		}
+	}
 	
 	
 
 	// 모든 채팅방 List를 db에서 불러옴
-	public CopyOnWriteArrayList<ChattingRoom> talkList(String me){
+	public List<ChattingRoom> talkList(String me){
+		// db에서 내 아이디에 해당하는 roomId 가져옴
+		List<String> roomId = chatRoomRepository.findRoomIdByUser(me);
 		
-		// 내가 포함되어 있는 모든 roomId 색출, 중복된 roomId 제거
-		List<String> roomIdList = chatRoomRepository.findRooIdByUser(me);
-		Set<String> set = new HashSet<>(roomIdList);
-		List<String>roomId = new ArrayList<>(set);
+		// roomId에 해당하는 채팅방을 모두 담음(addAll이 아는 db쿼리문을 조정하는 방법도 있음)
+		List<ChattingRoom> talkList= new CopyOnWriteArrayList<>();
+		for (String str : roomId) {
+			talkList.addAll(chatRoomRepository.findByRoomId(str));
+		}
 		
-		CopyOnWriteArrayList<ChattingRoom> talkList =  new CopyOnWriteArrayList<>(chatRoomRepository.findAll());
-		
-		// 해당 roomId에 해당하는 chattingRoom내용을 리스트에 담음
+		// 내 아이디에 해당 하는 db내용을 제거함
 		for (ChattingRoom chattingRoom : talkList) {
-			for (String str : roomId) {
-				if(!chattingRoom.getRoomId().equals(str)) {
-					talkList.remove(chattingRoom);
-				}
-			}
 			if(chattingRoom.getUser().equals(me)) {
 				talkList.remove(chattingRoom);
 			}
 		}
-
+			
 		return talkList;
 	}
-	
 
 	
 	
