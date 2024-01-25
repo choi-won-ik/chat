@@ -70,6 +70,11 @@
 	
 </script>
 
+
+
+
+
+
 <script>
 $(document).ready(()=>{
 	// 좌측 유저명 검색 input
@@ -104,7 +109,7 @@ $(document).ready(()=>{
 					str += "<h2>"+writer+"</h2></div>";
 					str += "<h3>"+timestamp+" </h3>";
 					str += "<div class='message'>";
-					str += "<b>" + message+ "</b>";
+					str += "<b>"+message+"</b>";
 					str += "</div></li>";
 					$("#chat").append(str);
 				}
@@ -113,13 +118,15 @@ $(document).ready(()=>{
 					str += "<div class='entete'>";
 					str += "<h2>"+writer+"</h2></div>";
 					str += "<div class='message'>";
-					str += "<b>" + message+ "</b></div>";
-					str += "<h3>"+timestamp+" </h3></li>";
+					str += "<b>"+message+"</b></div>";
+					str += "<h3>"+timestamp+"</h3></li>";
 					$("#chat").append(str);
 				}
 			}  
 		});
 	});
+
+
 
 	// 버튼 클릭 시 메시지 보내기
 	$("#button-send").on("click", (e)=>{
@@ -218,19 +225,14 @@ $(document).ready(()=>{
 			<div class="body" style="vertical-align: bottom">
 				<ul id="chat"></ul>
 			</div>
-
-			<footer>
-				<div id="Buy-Send">
-					<button type="button" id="button-send" >
-						<img src="/img/chat/dm.png" class="dm-icon" id='dm' alt="">
-					</button>
-				</div>
-	
-				<textarea id="msg" placeholder="입력하시오"></textarea>
+				
+			<footer>	
+				<input type="text" placeholder="입력하시오." id="msg" >
+				<button type="button" id="button-send" >
+					<img src="/img/chat/dm.png" class="dm-icon" id='dm' alt="">
+				</button>
 			</footer>	
 		</main>
 	</div>
 </body>
-
-
 </html>

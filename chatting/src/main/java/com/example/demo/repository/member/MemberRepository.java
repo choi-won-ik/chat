@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 import com.example.demo.Entity.member.Member;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 

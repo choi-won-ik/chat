@@ -1,9 +1,10 @@
 package com.example.demo.controller.chat;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo.Entity.chat.Chat;
 import com.example.demo.Entity.chat.ChattingRoom;
 import com.example.demo.service.chat.ChatService;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value = "/chat")
@@ -24,8 +23,8 @@ public class ChatController {
 	
 	// 채팅 main Page 실행
 	@GetMapping("/main")
-	public String main(Model model,HttpServletRequest request) {
-		String me = (String)request.getAttribute("me");
+	public String main(Model model,@AuthenticationPrincipal User user) {
+		String me = user.getUsername();
 		model.addAttribute("me", me);
 		
 		// main하면 좌측에 있는 채팅리스트
@@ -39,8 +38,8 @@ public class ChatController {
 
 	// 채팅창 개설
 	@PostMapping("/create")
-	public String Someone(@RequestParam("talkerName")String talkerName,HttpServletRequest request) {
-		String me = (String)request.getAttribute("me");
+	public String Someone(@RequestParam("talkerName")String talkerName,@AuthenticationPrincipal User user) {
+		String me = user.getUsername();
 		Long SomeoneUserNum = chatService.Someone(talkerName);
 		System.out.println("여기까지 성공!!!!!!!!!!");
 		
@@ -51,8 +50,8 @@ public class ChatController {
 
 	//채팅방 방문
 	@PostMapping("/visit")
-	public String visit(@RequestParam("talkerName")String talkerName,HttpServletRequest request) {
-		String me = (String)request.getAttribute("me");
+	public String visit(@RequestParam("talkerName")String talkerName,@AuthenticationPrincipal User user) {
+		String me = user.getUsername();
 		String roomId=chatService.findRoomId(talkerName,me);
 		System.out.println("TestTestTestTestTest");
 
@@ -62,8 +61,8 @@ public class ChatController {
 	}
 
 	@GetMapping("/room/{roomId}")
-	public String room(@PathVariable("roomId") String roomId,Model model,HttpServletRequest request) {
-		String me = (String)request.getAttribute("me");
+	public String room(@PathVariable("roomId") String roomId,Model model,@AuthenticationPrincipal User user) {
+		String me = user.getUsername();
 		List<Chat> MsgList = chatService.MessagList(roomId);
 		
 		for (Chat chat : MsgList) {
