@@ -9,10 +9,12 @@
 <link th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css}" rel="stylesheet">
 <link th:href="@{https://getbootstrap.com/docs/4.0/examples/signin/signin.css}" rel="stylesheet">
 <script>
+window.onload=()=>{
 	const logoutBtn = document.getElementById('logout_btn');
 	logoutBtn.addEventListener('click', () => {
 		sessionStorage.setItem('userid', '');
 	});
+};	
 </script>
 <body>
 	<div class="container">

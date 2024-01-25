@@ -27,7 +27,7 @@
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+index.user+"</h2>";
-				str += "<h3>대화내용</h3></label></button></form>";
+				str += "<h3>"+index.last+"</h3></label></button></form>";
 			$('.chattingList').append(str);
 			
 			const $chattingPerson = document.querySelectorAll('.chattingPesrson');
@@ -261,7 +261,7 @@ $(document).ready(()=>{
 
 
 	<!-- 모달 -->
-	<form th:action="@{/chat/create}" method="post" class="modal" id="modal">
+	<form th:action="@{/chat/visit}" method="post" class="modal" id="modal">
 		<div class="modal_body">
 			<div class="m_head">
 				<div class="modal_title">새로운 메시지</div>

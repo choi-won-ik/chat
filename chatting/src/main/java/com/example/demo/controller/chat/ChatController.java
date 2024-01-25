@@ -37,25 +37,22 @@ public class ChatController {
 	}
 
 	// 채팅창 개설
-	@PostMapping("/create")
-	public String Someone(@RequestParam("talkerName")String talkerName,@AuthenticationPrincipal User user) {
-		String me = user.getUsername();
-		Long SomeoneUserNum = chatService.Someone(talkerName);
-		System.out.println("여기까지 성공!!!!!!!!!!");
-		
-		String roomId = chatService.roomCreate(talkerName,me,SomeoneUserNum);
-		
-		return "redirect:/chat/room/"+roomId;
-	}
+//	@PostMapping("/create")
+//	public String Someone(@RequestParam("talkerName")String talkerName,@AuthenticationPrincipal User user) {
+//		String me = user.getUsername();
+//		Long SomeoneUserNum = chatService.Someone(talkerName);
+//		System.out.println("여기까지 성공!!!!!!!!!!");
+//		
+//		String roomId = chatService.roomCreate(talkerName,me,SomeoneUserNum);
+//		
+//		return "redirect:/chat/room/"+roomId;
+//	}
 
 	//채팅방 방문
 	@PostMapping("/visit")
 	public String visit(@RequestParam("talkerName")String talkerName,@AuthenticationPrincipal User user) {
 		String me = user.getUsername();
 		String roomId=chatService.findRoomId(talkerName,me);
-		System.out.println("TestTestTestTestTest");
-
-		System.out.println("TestTestTestTestTest");
 
 		return "redirect:/chat/room/"+roomId;
 	}

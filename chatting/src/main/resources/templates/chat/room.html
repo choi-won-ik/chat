@@ -15,6 +15,7 @@
 	let talkList=/*[[${talkList}]]*/[];
 	let messageList = /*[[${MsgList}]]*/[];
 	
+	
 </script>
 
 <script>
@@ -23,20 +24,20 @@
 		
 		// db에서 chattingRoom List 가져오기
 		talkList.forEach((index)=>{
-			// 대화 list 정의
+			// side 채팅리스트 정의
 			let str = "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
 				str += "<input type='hidden' name='talkerName' value='"+index.user+"'>"
 				str +="<button id='chattingListBTN' type='submit'>"
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+index.user+"</h2>";
-				str += "<h3>대화내용</h3></label></button></form>";
+				str += "<h3 id='lastMsg_"+talkerName+"'>"+index.last+"</h3></label></button></form>";
 			$('.chattingList').append(str);
 			
-			const $chattingPerson = document.querySelectorAll('.chattingPesrson');
+			
 		});	
 
-		
+		// main채팅 내역을 db에서 가져옴
 		messageList.forEach((index)=>{
 			if(index.writer===me){
 				let str = "<li class='me'>";
@@ -59,6 +60,8 @@
 			}
 			
 		});
+		
+		
 	};
 	
 	window.onunload=()=>{
@@ -76,28 +79,31 @@
 
 
 <script>
+	
 $(document).ready(()=>{
 	// 좌측 유저명 검색 input
 	let $searchUser = document.getElementById("searchUser");
+
 	
-	console.log(talkerName + ", " + roomId + ", " + me);
 
 	let sockJs = new SockJS("/ws-stomp");
 	//1. SockJS를 내부에 들고있는 stomp를 내어줌
 	let stomp = Stomp.over(sockJs);
+	
+
+	
 
 
-
-    //2. connection이 맺어지면 실행
-	stomp.connect({}, function (){
-			console.log("실행중");
+    //2. main채팅창 connection이 맺어지면 실행
+	stomp.connect({},()=>{
+		
 		//4. subscribe(path, callback)으로 메세지를 받을 수 있음
 		stomp.subscribe("/sub/chat/room/"+roomId, (chat) => {
 			
 			let content = JSON.parse(chat.body);
 
-			let writer = content.writer;
 			let str = '';
+			let writer = content.writer;
 			let message = content.message;
 			let timestamp = content.timestamp;
 			if(message===''){
@@ -107,7 +113,7 @@ $(document).ready(()=>{
 					str = "<li class='me'>";
 					str += "<div class='entete'>";
 					str += "<h2>"+writer+"</h2></div>";
-					str += "<h3>"+timestamp+" </h3>";
+					str += "<h3>"+timestamp+"</h3>";
 					str += "<div class='message'>";
 					str += "<b>"+message+"</b>";
 					str += "</div></li>";
@@ -124,6 +130,54 @@ $(document).ready(()=>{
 				}
 			}  
 		});
+		
+		
+		
+		
+		
+		// 좌측 대화내용을 가져옴
+		stomp.subscribe("/sub/chat/side/"+roomId,(chat)=>{
+			let $chattingPerson = document.querySelectorAll(".chattingPerson");
+			
+			for(let i=0; i<talkList.length; i++){
+				$chattingPerson[i].addEventListener("mouseover",()=>{
+					console.log("확인");
+				});
+			}
+			
+			let content = JSON.parse(chat.body);
+			
+			let str = '';
+			let writer = content.writer;
+			let message = content.message;
+			
+			let array=[];
+			talkList.forEach((index)=>{
+				array.push(index.user);
+			});
+			
+			if(!array.includes(talkerName)){
+				console.log("포함 안함");
+				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input type='hidden' name='talkerName' value='"+talkerName+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
+				str += "<h3>"+message+"</h3></label></button></form>";
+				$('.chattingList').append(str);
+			}else{
+				let address="#hidden_"+talkerName;
+				$(address).html(message);
+				console.log("포함");
+			}
+			
+			
+			
+			
+		});
+		
+		
 	});
 
 
@@ -134,10 +188,10 @@ $(document).ready(()=>{
 
 		console.log(me + ":" + msg.value);
 		stomp.send(
-				'/pub/chat/message',
-				{},
-				JSON.stringify({roomId: roomId, message: msg.value, writer: me})
-			);
+			'/pub/chat/message',
+			{},
+			JSON.stringify({roomId: roomId, message: msg.value, writer: me})
+		);
 		msg.value = '';
 	});
 
@@ -154,6 +208,7 @@ $(document).ready(()=>{
 				{}, 
 				JSON.stringify({roomId: roomId, message: msg.value, writer: me})
 			);
+			
 			msg.value = '';
 
 			return false;
