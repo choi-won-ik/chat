@@ -100,5 +100,10 @@ public class ChatServiceImpl implements ChatService{
 		return memberRepository.findUserById(talkerName);
 	}
 
+	@Override
+	public Long number(String me) {
+		return memberRepository.findIdByUserid(me);
+	}
+
 
 }

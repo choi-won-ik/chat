@@ -74,6 +74,9 @@ public class ChatController {
 		model.addAttribute("talkList", chatService.talkList(me));
 		// db 저장된 채팅내용 출력
 		model.addAttribute("MsgList",MsgList);
+		// 메시지 받기용 내 고유아이디
+		model.addAttribute("meNum",chatService.number(me));
+		
 		return "chat/room";
 	}
 	

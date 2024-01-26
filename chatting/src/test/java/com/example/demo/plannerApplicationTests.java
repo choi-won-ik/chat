@@ -13,10 +13,16 @@ class plannerApplicationTests {
 	}
 	
 	public static void main (String[] args) throws java.lang.Exception{
-		LocalDateTime currentDateTime = LocalDateTime.now();
-        System.out.println("현재 날짜와 시간: " + currentDateTime);
-        int time = currentDateTime.hashCode();
-        System.out.println(time);
+		String input = "10&20";
+
+        // & 이전의 내용을 없애기
+        int index = input.indexOf("&");
+        if (index != -1) {
+            String result = input.substring(index + 1);
+            System.out.println(result);
+        } else {
+            System.out.println("문자열에 '&'이 없습니다.");
+        }
 	}
 
 }

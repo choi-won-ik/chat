@@ -23,5 +23,7 @@ public interface ChatService {
 	String findRoomId(String talkerName, String me);
 
 	String roomTalkerName(String me, String roomId);
+
+	Long number(String me);
 			
 }

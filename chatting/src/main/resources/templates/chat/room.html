@@ -14,8 +14,7 @@
 	let me = sessionStorage.getItem('userid');
 	let talkList=/*[[${talkList}]]*/[];
 	let messageList = /*[[${MsgList}]]*/[];
-	
-	
+	let meNum = /*[[${meNum}]]*/ "";
 </script>
 
 <script>
@@ -32,7 +31,7 @@
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+index.user+"</h2>";
 				str += "<h3 id='lastMsg_"+talkerName+"'>"+index.last+"</h3></label></button></form>";
-			$('.chattingList').append(str);
+			$('.chattingList').prepend(str);
 			
 			
 		});	
@@ -132,52 +131,92 @@ $(document).ready(()=>{
 		});
 		
 		
-		
-		
-		
-		// 좌측 대화내용을 가져옴
-		stomp.subscribe("/sub/chat/side/"+roomId,(chat)=>{
-			let $chattingPerson = document.querySelectorAll(".chattingPerson");
-			
-			for(let i=0; i<talkList.length; i++){
-				$chattingPerson[i].addEventListener("mouseover",()=>{
-					console.log("확인");
-				});
-			}
+		// 좌측 대화내용 추가
+		stomp.subscribe("/sub/chat/side/"+meNum,(chat)=>{
 			
 			let content = JSON.parse(chat.body);
+			
+			// side 채팅방의 갯수 표시용
+			let $chattingPersonNum = document.querySelectorAll(".chattingPerson");
 			
 			let str = '';
 			let writer = content.writer;
 			let message = content.message;
 			
+			// 대화상대 배열
 			let array=[];
-			talkList.forEach((index)=>{
-				array.push(index.user);
-			});
+			let count=0;
+
 			
-			if(!array.includes(talkerName)){
-				console.log("포함 안함");
+			for(let i=0; i<$chattingPersonNum.length; i++){
+				let $talkUserName = [];
+				$talkUserName.push(document.getElementById("talkUserName").innerText);
+				let $chattingPerson = [];
+				$chattingPerson.push(document.getElementById("chattingPerson")); 
+				console.log($talkUserName[i]);
+				array.push($talkUserName[i]);
+			}
+			
+			// 새로운 채팅창에 writer가 나라면 지금 대화하고 있는 상대로
+			if(writer===me&&!array.includes(talkerName)){
 				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
-				str += "<input type='hidden' name='talkerName' value='"+talkerName+"'>"
+				str += "<input id='hidden' type='hidden' name='talkerName' value='"+talkerName+"'>"
 				str +="<button id='chattingListBTN' type='submit'>"
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
 				str += "<h3>"+message+"</h3></label></button></form>";
-				$('.chattingList').append(str);
-			}else{
-				let address="#hidden_"+talkerName;
-				$(address).html(message);
-				console.log("포함");
+				$('.chattingList').prepend(str);
 			}
-			
-			
-			
-			
+			// 새로운 채팅창에 wirter가 남이라면 무조건 남이
+			else if(writer!==me&&!array.includes(writer)){
+				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input id='hidden' type='hidden' name='talkerName' value='"+writer+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+writer+"</h2>";
+				str += "<h3>"+message+"</h3></label></button></form>";
+				$('.chattingList').prepend(str);
+			}
+			// 있던 채팅창에 wirter가 나라면 지금 대화하고 있는 상대로
+			else if(writer===me&&array.includes(talkerName)){
+				while(array[count]!==talkerName){
+					count++;
+				}
+				console.log(array[count]);
+				$chattingPerson[count].remove();
+				
+				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input id='hidden' type='hidden' name='talkerName' value='"+talkerName+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
+				str += "<h3>"+message+"</h3></label></button></form>";
+				$('.chattingList').prepend(str);
+			}
+			// 있던 채팅창에 wirter가 남이라면 남으로다가
+			else if(writer!==me&&array.includes(writer)){
+				while(array[count]!==writer){
+					count++;
+				}
+				console.log(array[count]);
+				$chattingPerson[count].remove();
+				
+				
+				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input id='hidden' type='hidden' name='talkerName' value='"+writer+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+writer+"</h2>";
+				str += "<h3>"+message+"</h3></label></button></form>";
+				$('.chattingList').prepend(str);
+			}
+			array=[];
 		});
-		
-		
+
 	});
 
 
