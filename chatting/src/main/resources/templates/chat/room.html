@@ -57,10 +57,9 @@
 					str += "<h3>"+index.timestamp+" </h3></li>";
 					$("#chat").append(str);
 			}
-			
 		});
 		
-		
+
 	};
 	
 	window.onunload=()=>{
@@ -73,7 +72,12 @@
 </script>
 
 
+<script>
+	
+	
+	
 
+</script>
 
 
 
@@ -81,16 +85,16 @@
 	
 $(document).ready(()=>{
 	// 좌측 유저명 검색 input
-	let $searchUser = document.getElementById("searchUser");
+	const $searchUser = document.getElementById("searchUser");
+	// 클래스 명을 변경가능하게 하기위해 var을 사용
+	let $UserListDrop = document.getElementById("UserListDrop");
+	// 드롭다운 각각의 list
+	let $UserList=document.getElementsByClassName('UserList');
 
-	
 
 	let sockJs = new SockJS("/ws-stomp");
 	//1. SockJS를 내부에 들고있는 stomp를 내어줌
 	let stomp = Stomp.over(sockJs);
-	
-
-	
 
 
     //2. main채팅창 connection이 맺어지면 실행
@@ -136,8 +140,10 @@ $(document).ready(()=>{
 			
 			let content = JSON.parse(chat.body);
 			
-			// side 채팅방의 갯수 표시용
-			let $chattingPersonNum = document.querySelectorAll(".chattingPerson");
+			
+		
+			
+			
 			
 			let str = '';
 			let writer = content.writer;
@@ -145,17 +151,15 @@ $(document).ready(()=>{
 			
 			// 대화상대 배열
 			let array=[];
-			let count=0;
-
 			
-			for(let i=0; i<$chattingPersonNum.length; i++){
-				let $talkUserName = [];
-				$talkUserName.push(document.getElementById("talkUserName").innerText);
-				let $chattingPerson = [];
-				$chattingPerson.push(document.getElementById("chattingPerson")); 
-				console.log($talkUserName[i]);
-				array.push($talkUserName[i]);
+			// 대화상대 추가용
+			const $chattingList =document.getElementById('chattingList');
+			const talkUserNameH2 = $chattingList.getElementsByTagName('h2');
+			for(let i=0; i<talkUserNameH2.length; i++){
+				array.push(talkUserNameH2[i].innerText);
 			}
+			const $chattingPerson = document.getElementsByClassName('chattingPerson');
+
 			
 			// 새로운 채팅창에 writer가 나라면 지금 대화하고 있는 상대로
 			if(writer===me&&!array.includes(talkerName)){
@@ -181,11 +185,12 @@ $(document).ready(()=>{
 			}
 			// 있던 채팅창에 wirter가 나라면 지금 대화하고 있는 상대로
 			else if(writer===me&&array.includes(talkerName)){
-				while(array[count]!==talkerName){
-					count++;
+				for(let i =0; i<array.length; i++){
+					if(array[i]===talkerName){
+						console.log(array[i]);
+						$chattingPerson[i].remove();
+					}
 				}
-				console.log(array[count]);
-				$chattingPerson[count].remove();
 				
 				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
 				str += "<input id='hidden' type='hidden' name='talkerName' value='"+talkerName+"'>"
@@ -198,12 +203,12 @@ $(document).ready(()=>{
 			}
 			// 있던 채팅창에 wirter가 남이라면 남으로다가
 			else if(writer!==me&&array.includes(writer)){
-				while(array[count]!==writer){
-					count++;
+				for(let i =0; i<array.length; i++){
+					if(array[i]===writer){
+						console.log(array[i]);
+						$chattingPerson[i].remove();
+					}
 				}
-				console.log(array[count]);
-				$chattingPerson[count].remove();
-				
 				
 				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
 				str += "<input id='hidden' type='hidden' name='talkerName' value='"+writer+"'>"
@@ -218,7 +223,6 @@ $(document).ready(()=>{
 		});
 
 	});
-
 
 
 	// 버튼 클릭 시 메시지 보내기
@@ -254,9 +258,10 @@ $(document).ready(()=>{
 		}
 	});
 	
-	
-	
+	// user명 검색 시 db에서 user명 출력 함수
 	inputEvent=()=>{
+		$searchUser.removeEventListener('click', clickEvent);
+		
 		$UserListDrop=document.getElementById("UserListDrop");
 		
 		$UserListDrop.innerHTML="";
@@ -272,8 +277,17 @@ $(document).ready(()=>{
 				}),
 				success:(response)=>{
 					response.forEach(item=>{
-						let str = "<button class='UserList'>"+item.userid+"</button>";
-						$("#UserListDrop").append(str);
+						// 드롭 다운 실행 조건
+						if(!$UserListDrop.classList.contains('show')&&item.userid!==null){
+							$UserListDrop.classList.add('show');						
+						}
+						console.log(item.userid);
+						// 드롭다운이 실행되면 userList출력
+						if($UserListDrop.classList.contains('show')){
+							let str = "<button class='UserList'>"+item.userid+"</button>";
+							$("#UserListDrop").append(str);
+						}
+						
 					});
 				},
 				error :(request, status, error)=>{
@@ -284,9 +298,57 @@ $(document).ready(()=>{
 		
 	};
 	
+	// 드롭다운에 user명 검색
 	$searchUser.addEventListener('input', inputEvent);
 	
-	 
+	// 다시 검색 시도 시 드롭다운 실행 함수
+	clickEvent=()=>{
+		let UserList = $searchUser.value;
+		
+		$.ajax({
+			type : 'POST',
+			url : "/chat/UserList",
+			dataType : "JSON",
+			data : ({
+				userid : UserList
+			}),
+			success:(response)=>{
+				response.forEach(item=>{
+					// 드롭 다운 실행 조건
+					if(!$UserListDrop.classList.contains('show')&&item.userid!==null){
+						$UserListDrop.classList.add('show');						
+					}
+					console.log(item.userid);
+					// 드롭다운이 실행되면 userList출력
+					if($UserListDrop.classList.contains('show')){
+						let str = "<button class='UserList'>"+item.userid+"</button>";
+						$("#UserListDrop").append(str);
+					}			
+				});
+			},
+			error :(request, status, error)=>{
+				console.log(error);
+			}
+		})
+	};
+	
+	// 클릭시  드롭다운 실행 함수 적용
+	$searchUser.addEventListener('click', clickEvent);
+
+	
+	// 드롭다운 종료 함수
+	blurEvent=()=>{
+		if($UserListDrop.classList.contains('show')){
+			$UserListDrop.classList.remove('show');						
+		}
+		
+		// 드롭다운 안에 있는 userList모두 제거
+		$UserListDrop.innerHTML="";
+	};
+	
+	// 드롭다운 종료
+	$searchUser.addEventListener('blur', blurEvent);
+
 });
 </script>
 

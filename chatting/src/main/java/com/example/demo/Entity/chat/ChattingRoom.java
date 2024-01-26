@@ -26,9 +26,9 @@ public class ChattingRoom {
 
 	private String last;
 	
-	private int time;
+	private String time;
 	
-	public static ChattingRoom createRoom(String roomId,String user,String last, int time) {
+	public static ChattingRoom createRoom(String roomId,String user,String last, String time) {
 		return new ChattingRoom(null, roomId, user,last, time);
 	}
 }

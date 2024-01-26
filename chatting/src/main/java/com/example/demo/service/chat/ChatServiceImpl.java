@@ -70,12 +70,10 @@ public class ChatServiceImpl implements ChatService{
 				talkList.remove(chattingRoom);
 			}
 		}
-			
+		
 		return talkList;
 	}
 
-	
-	
 
 	@Override
 	public String findRoomId(String talkerName, String me) {

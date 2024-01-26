@@ -45,7 +45,7 @@ public class KafkaConsumer {
 		// 메시지 시간을 문자열로 나타낸 후 messageDTO 셋팅
 		message.setTimestamp(time.format(formatter).toString());
 		// 메시지 해시 코드 지정
-		int timeCode = time.hashCode();
+		String timeStr = time.toString();
 		// 메시지 처리 로직을 여기에 작성합니다.
 		Chat chat = Chat.messageText(message.getRoomId(),message.getWriter(), message.getMessage(), message.getTimestamp());
 		kafkaRepository.save(chat);
@@ -62,14 +62,14 @@ public class KafkaConsumer {
 		
 		
 		// 메시지를 보낸 사람으로 db저장
-		ChattingRoom chattingRoom = ChattingRoom.createRoom(message.getRoomId(), message.getWriter(), message.getMessage(),timeCode );
+		ChattingRoom chattingRoom = ChattingRoom.createRoom(message.getRoomId(), message.getWriter(), message.getMessage(),timeStr );
 		List<ChattingRoom> list=chatRoomRepository.findByRoomId(message.getRoomId());
 		if(list.isEmpty()) {
 			chatRoomRepository.save(chattingRoom);
 			// 메시지를 받은 사람으로 db저장
-			chatRoomRepository.save(ChattingRoom.createRoom(message.getRoomId(),talkerNum,message.getMessage(),timeCode));
+			chatRoomRepository.save(ChattingRoom.createRoom(message.getRoomId(),talkerNum,message.getMessage(),timeStr));
 		}else {
-			update(list,timeCode,message.getMessage());
+			update(list,timeStr,message.getMessage());
 		}
 	}	
 	
@@ -78,9 +78,9 @@ public class KafkaConsumer {
 
 	// db에 해당 채팅 리스트가 있을 시 시간만 업대이트 시킴.
 	@Transactional
-	public void update(List<ChattingRoom> list,int timeCode,String last) {
+	public void update(List<ChattingRoom> list,String timeStr,String last) {
 		for (ChattingRoom room : list) {
-			room.setTime(timeCode);
+			room.setTime(timeStr);
 			room.setLast(last);
 			
 			chatRoomRepository.save(room);
