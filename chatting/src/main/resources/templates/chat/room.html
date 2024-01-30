@@ -73,25 +73,12 @@
 
 
 <script>
+	// 새로운 채팅을 append하기 위해
+	const $chat = document.getElementById('chat');
+	// 새로운 채팅리스트를 append하기 위해
+	const $chattingList = document.getElementById('chattingList');
 	
 	
-	
-
-</script>
-
-
-
-<script>
-	
-$(document).ready(()=>{
-	// 좌측 유저명 검색 input
-	const $searchUser = document.getElementById("searchUser");
-	// 클래스 명을 변경가능하게 하기위해 var을 사용
-	let $UserListDrop = document.getElementById("UserListDrop");
-	// 드롭다운 각각의 list
-	let $UserList=document.getElementsByClassName('UserList');
-
-
 	let sockJs = new SockJS("/ws-stomp");
 	//1. SockJS를 내부에 들고있는 stomp를 내어줌
 	let stomp = Stomp.over(sockJs);
@@ -120,7 +107,7 @@ $(document).ready(()=>{
 					str += "<div class='message'>";
 					str += "<b>"+message+"</b>";
 					str += "</div></li>";
-					$("#chat").append(str);
+					$('#chat').append(str);
 				}
 				else{
 					str = "<li class='you'>";
@@ -129,7 +116,7 @@ $(document).ready(()=>{
 					str += "<div class='message'>";
 					str += "<b>"+message+"</b></div>";
 					str += "<h3>"+timestamp+"</h3></li>";
-					$("#chat").append(str);
+					$('#chat').append(str);
 				}
 			}  
 		});
@@ -139,10 +126,6 @@ $(document).ready(()=>{
 		stomp.subscribe("/sub/chat/side/"+meNum,(chat)=>{
 			
 			let content = JSON.parse(chat.body);
-			
-			
-		
-			
 			
 			
 			let str = '';
@@ -170,7 +153,7 @@ $(document).ready(()=>{
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
 				str += "<h3>"+message+"</h3></label></button></form>";
-				$('.chattingList').prepend(str);
+				$('#chattingList').prepend(str);
 			}
 			// 새로운 채팅창에 wirter가 남이라면 무조건 남이
 			else if(writer!==me&&!array.includes(writer)){
@@ -181,13 +164,12 @@ $(document).ready(()=>{
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+writer+"</h2>";
 				str += "<h3>"+message+"</h3></label></button></form>";
-				$('.chattingList').prepend(str);
+				$('#chattingList').prepend(str);
 			}
 			// 있던 채팅창에 wirter가 나라면 지금 대화하고 있는 상대로
 			else if(writer===me&&array.includes(talkerName)){
 				for(let i =0; i<array.length; i++){
 					if(array[i]===talkerName){
-						console.log(array[i]);
 						$chattingPerson[i].remove();
 					}
 				}
@@ -199,13 +181,12 @@ $(document).ready(()=>{
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
 				str += "<h3>"+message+"</h3></label></button></form>";
-				$('.chattingList').prepend(str);
+				$('#chattingList').prepend(str);
 			}
 			// 있던 채팅창에 wirter가 남이라면 남으로다가
 			else if(writer!==me&&array.includes(writer)){
 				for(let i =0; i<array.length; i++){
 					if(array[i]===writer){
-						console.log(array[i]);
 						$chattingPerson[i].remove();
 					}
 				}
@@ -217,7 +198,7 @@ $(document).ready(()=>{
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+writer+"</h2>";
 				str += "<h3>"+message+"</h3></label></button></form>";
-				$('.chattingList').prepend(str);
+				$('#chattingList').prepend(str);
 			}
 			array=[];
 		});
@@ -226,9 +207,10 @@ $(document).ready(()=>{
 
 
 	// 버튼 클릭 시 메시지 보내기
-	$("#button-send").on("click", (e)=>{
-		let msg = document.getElementById("msg");
-
+	sendBTN=()=>{
+		let msg = document.getElementById('msg');
+		
+		
 		console.log(me + ":" + msg.value);
 		stomp.send(
 			'/pub/chat/message',
@@ -236,16 +218,18 @@ $(document).ready(()=>{
 			JSON.stringify({roomId: roomId, message: msg.value, writer: me})
 		);
 		msg.value = '';
-	});
-
+		
+		return false;
+	};
+	
 	// ENTER키 눌렀을 때 메시지 보내기
-	$("#msg").on("keydown", (e)=>{
+	enterSend=(e)=>{
+		let msg = document.getElementById('msg');
+		
 		if (e.key === "Enter") {
 			e.preventDefault();
-			let msg = document.getElementById("msg");
 
 			console.log(me + ":" + msg.value);
-			console.log(roomId);
 			stomp.send(
 				'/pub/chat/message', 
 				{}, 
@@ -253,58 +237,26 @@ $(document).ready(()=>{
 			);
 			
 			msg.value = '';
-
-			return false;
 		}
-	});
-	
-	// user명 검색 시 db에서 user명 출력 함수
-	inputEvent=()=>{
-		$searchUser.removeEventListener('click', clickEvent);
-		
-		$UserListDrop=document.getElementById("UserListDrop");
-		
-		$UserListDrop.innerHTML="";
-		if($UserListDrop.innerHTML.trim()===""){
-			let UserList = $searchUser.value;
-			console.log(UserList);
-			$.ajax({
-				type : 'POST',
-				url : "/chat/UserList",
-				dataType : "JSON",
-				data : ({
-					userid : UserList
-				}),
-				success:(response)=>{
-					response.forEach(item=>{
-						// 드롭 다운 실행 조건
-						if(!$UserListDrop.classList.contains('show')&&item.userid!==null){
-							$UserListDrop.classList.add('show');						
-						}
-						console.log(item.userid);
-						// 드롭다운이 실행되면 userList출력
-						if($UserListDrop.classList.contains('show')){
-							let str = "<button class='UserList'>"+item.userid+"</button>";
-							$("#UserListDrop").append(str);
-						}
-						
-					});
-				},
-				error :(request, status, error)=>{
-					console.log(error);
-				}
-			})
-		}
-		
+		return false;
 	};
+</script>
+
+
+<script>
 	
-	// 드롭다운에 user명 검색
-	$searchUser.addEventListener('input', inputEvent);
+$(document).ready(()=>{
+	// 좌측 유저명 검색 input
+	const $searchUser = document.getElementById("searchUser");
+	// 클래스 명을 변경가능하게 하기위해 var을 사용
+	let $UserListDrop = document.getElementById("UserListDrop");
+	// 드롭다운 각각의 list의 버튼태그
+	let $UserListBTN=$UserListDrop.getElementsByTagName('button');
+	// 방향키 카운터
+	let count = -1;
 	
-	// 다시 검색 시도 시 드롭다운 실행 함수
-	clickEvent=()=>{
-		let UserList = $searchUser.value;
-		
+	// 좌측 검색창에서 user 검색
+	userSearchFNC=(UserList)=>{
 		$.ajax({
 			type : 'POST',
 			url : "/chat/UserList",
@@ -323,7 +275,8 @@ $(document).ready(()=>{
 					if($UserListDrop.classList.contains('show')){
 						let str = "<button class='UserList'>"+item.userid+"</button>";
 						$("#UserListDrop").append(str);
-					}			
+					}
+					
 				});
 			},
 			error :(request, status, error)=>{
@@ -331,17 +284,98 @@ $(document).ready(()=>{
 			}
 		})
 	};
+
+
+	// 좌측 검색창 마우스 over로 요소 선택
+	$UserListDrop.addEventListener('mouseover',()=>{
+		for(let i=0; i<$UserListBTN.length; i++){
+			$UserListBTN[i].addEventListener('mouseover',()=>{
+				if($searchUser.value!==""){
+					$searchUser.value="";
+				}
+				$searchUser.value=$UserListBTN[i].innerText;
+				 
+			});
+		}
+		return false;
+	});
+
+	
+	// user명 검색 시 db에서 user명 출력 함수
+	inputEvent=()=>{
+		$searchUser.removeEventListener('click', clickEvent);
+		
+		$UserListDrop=document.getElementById("UserListDrop");
+		
+		$UserListDrop.innerHTML="";
+		if($UserListDrop.innerHTML.trim()===""){
+			let UserList = $searchUser.value;
+			console.log(UserList);
+
+		}
+		
+		userSearchFNC(UserList);		
+	};
+
+	
+	// 드롭다운에 user명 검색
+	$searchUser.addEventListener('input', inputEvent);
+	
+	
+	// 다시 검색 시도 시 드롭다운 실행 함수
+	clickEvent=()=>{
+		let UserList = $searchUser.value;
+		
+		userSearchFNC(UserList);
+		
+	return false;
+	};
 	
 	// 클릭시  드롭다운 실행 함수 적용
 	$searchUser.addEventListener('click', clickEvent);
+	
+	
+	
+	
+	$searchUser.addEventListener('keydown',(e)=>{
+		// 유저 버튼에 생긴 'on'모두 지우기
+		for(let i=0; i<$UserListBTN.length; i++){
+			$UserListBTN[i].classList.remove('on');	
+		}
+		
+		// input창에 내용 모두 지우기
+		$searchUser.value="";
+		
 
+		// 아랫방향키 이벤트
+		if(e.key === "ArrowDown"&&count<$UserListBTN.length-1){
+			if(!$UserListDrop.classList.contains('show')){
+				$UserListDrop.classList.add('show');
+			}
+			count++;
+		}
+		// 윗 방향키 이벤트
+		else if(e.key === "ArrowUp"&&count>=0){
+			count--;
+			// 가장 위에까지 선택 되었을 때, 윗 방향키 동작 시
+			if(count==-1){
+				$UserListDrop.classList.remove('show');
+			}
+		}
+		
+		// 해당하는 버튼만 선택될 수 있도록 한다.
+		if(count>-1){
+			$UserListBTN[count].classList.toggle('on');
+			$searchUser.value=$UserListBTN[count].innerText;
+		}
+	
+	});
 	
 	// 드롭다운 종료 함수
 	blurEvent=()=>{
 		if($UserListDrop.classList.contains('show')){
 			$UserListDrop.classList.remove('show');						
 		}
-		
 		// 드롭다운 안에 있는 userList모두 제거
 		$UserListDrop.innerHTML="";
 	};
@@ -383,8 +417,8 @@ $(document).ready(()=>{
 			</div>
 				
 			<footer>	
-				<input type="text" placeholder="입력하시오." id="msg" >
-				<button type="button" id="button-send" >
+				<input type="text" placeholder="입력하시오." id="msg" onkeypress="enterSend(event)">
+				<button type="button" id="sendBTN" onclick="sendBTN()">
 					<img src="/img/chat/dm.png" class="dm-icon" id='dm' alt="">
 				</button>
 			</footer>	

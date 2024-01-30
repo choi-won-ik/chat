@@ -2,6 +2,8 @@ package com.example.demo.service.chat;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -68,6 +70,23 @@ public class ChatServiceImpl implements ChatService{
 		for (ChattingRoom chattingRoom : talkList) {
 			if(chattingRoom.getUser().equals(me)) {
 				talkList.remove(chattingRoom);
+			}
+		}
+
+		List<LocalDateTime> array = new ArrayList<>();
+		List<Integer> arr = new ArrayList<>();
+		for (ChattingRoom chattingRoom : talkList) {
+			LocalDateTime temp=LocalDateTime.parse(chattingRoom.getTime());
+			array.add(temp);
+			for (LocalDateTime localDateTime : array) {
+				int before = temp.compareTo(localDateTime);
+				 if (before < 0) {
+			            arr.add(before);
+			        }
+				 else {
+					 talkList.add(chattingRoom);
+					 array.remove(localDateTime);
+				 }
 			}
 		}
 		
