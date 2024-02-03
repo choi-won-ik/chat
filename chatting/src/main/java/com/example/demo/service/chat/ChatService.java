@@ -25,5 +25,9 @@ public interface ChatService {
 	String roomTalkerName(String me, String roomId);
 
 	Long number(String me);
+
+	boolean proper(Long meNum,String roomId);
+
+	int receive(String roomId,String me);
 			
 }

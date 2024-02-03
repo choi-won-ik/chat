@@ -20,5 +20,5 @@ public interface ChatRoomRepository extends JpaRepository<ChattingRoom, Long>{
 
 	CopyOnWriteArrayList<ChattingRoom> findByUser(String me);
 
-	List<ChattingRoom> findByRoomId(@Param("roomId") String roomId);
+	CopyOnWriteArrayList<ChattingRoom> findByRoomId(@Param("roomId") String roomId);
 }

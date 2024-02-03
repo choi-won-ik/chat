@@ -15,13 +15,12 @@
 	let talkList=/*[[${talkList}]]*/[];
 	let messageList = /*[[${MsgList}]]*/[];
 	let meNum = /*[[${meNum}]]*/ "";
+	let receive = /*[[${receive}]]*/ "";
 </script>
 
 <script>
 	window.onload=()=>{
-		// 좌측 유저리스트 중 유저명
-		
-		// db에서 chattingRoom List 가져오기
+		// db에서 좌측 채팅List 가져오기
 		talkList.forEach((index)=>{
 			// side 채팅리스트 정의
 			let str = "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
@@ -30,11 +29,12 @@
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+index.user+"</h2>";
+				if(receive===1){
+					str += "<span class='receive'></span>";
+				}
 				str += "<h3 id='lastMsg_"+talkerName+"'>"+index.last+"</h3></label></button></form>";
 			$('.chattingList').prepend(str);
-			
-			
-		});	
+		});
 
 		// main채팅 내역을 db에서 가져옴
 		messageList.forEach((index)=>{
@@ -65,8 +65,6 @@
 	window.onunload=()=>{
 		// 좌측 유저명 검색 input
 		let $searchUser = document.getElementById("searchUser");
-		
-		$searchUser.removeEventListener('input', inputEvent);
 	};
 	
 </script>
@@ -75,8 +73,6 @@
 <script>
 	// 새로운 채팅을 append하기 위해
 	const $chat = document.getElementById('chat');
-	// 새로운 채팅리스트를 append하기 위해
-	const $chattingList = document.getElementById('chattingList');
 	
 	
 	let sockJs = new SockJS("/ws-stomp");
@@ -136,7 +132,7 @@
 			let array=[];
 			
 			// 대화상대 추가용
-			const $chattingList =document.getElementById('chattingList');
+			const $chattingList = document.getElementById('chattingList');
 			const talkUserNameH2 = $chattingList.getElementsByTagName('h2');
 			for(let i=0; i<talkUserNameH2.length; i++){
 				array.push(talkUserNameH2[i].innerText);
@@ -144,7 +140,7 @@
 			const $chattingPerson = document.getElementsByClassName('chattingPerson');
 
 			
-			// 새로운 채팅창에 writer가 나라면 지금 대화하고 있는 상대로
+			// 현재 방문하고 있지 않은 roomId에서 내가 다른사람에게 메시지를 보낼 때
 			if(writer===me&&!array.includes(talkerName)){
 				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
 				str += "<input id='hidden' type='hidden' name='talkerName' value='"+talkerName+"'>"
@@ -155,7 +151,7 @@
 				str += "<h3>"+message+"</h3></label></button></form>";
 				$('#chattingList').prepend(str);
 			}
-			// 새로운 채팅창에 wirter가 남이라면 무조건 남이
+			// 현재 방문하고 있지 않은 roomId에서 다름사람이 내게 메시지를 보낼 때
 			else if(writer!==me&&!array.includes(writer)){
 				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
 				str += "<input id='hidden' type='hidden' name='talkerName' value='"+writer+"'>"
@@ -163,10 +159,11 @@
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+writer+"</h2>";
+				str += "<span class='receive'></span>";
 				str += "<h3>"+message+"</h3></label></button></form>";
 				$('#chattingList').prepend(str);
 			}
-			// 있던 채팅창에 wirter가 나라면 지금 대화하고 있는 상대로
+			// 현재 방문하고 있는 roomId에서 내가 상대에게 메시지를 보낼 때
 			else if(writer===me&&array.includes(talkerName)){
 				for(let i =0; i<array.length; i++){
 					if(array[i]===talkerName){
@@ -180,10 +177,11 @@
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
+				str += "<span class='receive'></span>";
 				str += "<h3>"+message+"</h3></label></button></form>";
 				$('#chattingList').prepend(str);
 			}
-			// 있던 채팅창에 wirter가 남이라면 남으로다가
+			// 현재 방문하고 있는 roomId에서 상대가 내게 메시지를 보낼 때
 			else if(writer!==me&&array.includes(writer)){
 				for(let i =0; i<array.length; i++){
 					if(array[i]===writer){
@@ -244,19 +242,22 @@
 
 
 <script>
-	
 $(document).ready(()=>{
 	// 좌측 유저명 검색 input
-	const $searchUser = document.getElementById("searchUser");
+	let $searchUser = document.getElementById("searchUser");
 	// 클래스 명을 변경가능하게 하기위해 var을 사용
 	let $UserListDrop = document.getElementById("UserListDrop");
 	// 드롭다운 각각의 list의 버튼태그
-	let $UserListBTN=$UserListDrop.getElementsByTagName('button');
+	let $UserListBTN=document.getElementsByClassName('UserList');
+	
 	// 방향키 카운터
-	let count = -1;
+	let count = 0;
 	
 	// 좌측 검색창에서 user 검색
-	userSearchFNC=(UserList)=>{
+	const userSearchFNC=()=>{
+		// input창에 있는 유저명을 ajax로 db에서 검색
+		let UserList=$searchUser.value;
+		console.log(UserList);
 		$.ajax({
 			type : 'POST',
 			url : "/chat/UserList",
@@ -266,115 +267,88 @@ $(document).ready(()=>{
 			}),
 			success:(response)=>{
 				response.forEach(item=>{
+					
 					// 드롭 다운 실행 조건
 					if(!$UserListDrop.classList.contains('show')&&item.userid!==null){
 						$UserListDrop.classList.add('show');						
 					}
-					console.log(item.userid);
+					
 					// 드롭다운이 실행되면 userList출력
 					if($UserListDrop.classList.contains('show')){
 						let str = "<button class='UserList'>"+item.userid+"</button>";
 						$("#UserListDrop").append(str);
 					}
-					
 				});
+				
+				// 드롭다운 각각의 list의 클레스
+				let $UserListCLA = document.querySelectorAll('.UserList');
+				
+				console.log($UserListCLA.length);
+				
+				for(let i=0; i<$UserListCLA.length; i++){
+					// 드롭다운 메뉴에 마우스 오버했을 때
+					$UserListBTN[i].addEventListener('mouseover',()=>{
+						if($UserListBTN[i].classList.contains('on')){
+							$UserListBTN[i].classList.remove('on');
+						}
+						console.log("마우스 오버");
+					});
+					
+					// 드롭다운 메뉴에 마우스 아웃했을 때
+					$UserListBTN[i].addEventListener('mouseout',()=>{
+						console.log("마우스 아웃");
+					});
+				}
+				
 			},
-			error :(request, status, error)=>{
-				console.log(error);
+			error :()=>{
+				alert("알 수 없는 오류");
 			}
 		})
 	};
 
+		
+		
+		
 
-	// 좌측 검색창 마우스 over로 요소 선택
-	$UserListDrop.addEventListener('mouseover',()=>{
-		for(let i=0; i<$UserListBTN.length; i++){
-			$UserListBTN[i].addEventListener('mouseover',()=>{
-				if($searchUser.value!==""){
+			
+			
+			$searchUser.addEventListener('keydown',(e)=>{
+				// 아랫방향키를 입력했을 때
+				if(e.key === "ArrowDown"){
+					// input창의 내용을 모두 제거
 					$searchUser.value="";
+					console.log("down");
 				}
-				$searchUser.value=$UserListBTN[i].innerText;
-				 
+				//윗 방향키를 입력했을 때
+				else if(e.key=== "ArrowUp"){
+					$searchUser.value="";
+					console.log("up");
+				}
+				else if(e.keyCode === 13){
+					console.log("enter키 버튼");
+				}
+				else{
+					$searchUser.addEventListener(input,()=>{
+						console.log("글자 입력");
+					});
+				}
 			});
-		}
-		return false;
-	});
-
-	
-	// user명 검색 시 db에서 user명 출력 함수
-	inputEvent=()=>{
-		$searchUser.removeEventListener('click', clickEvent);
+			
 		
-		$UserListDrop=document.getElementById("UserListDrop");
-		
-		$UserListDrop.innerHTML="";
-		if($UserListDrop.innerHTML.trim()===""){
-			let UserList = $searchUser.value;
-			console.log(UserList);
-
-		}
-		
-		userSearchFNC(UserList);		
-	};
-
-	
-	// 드롭다운에 user명 검색
-	$searchUser.addEventListener('input', inputEvent);
-	
-	
-	// 다시 검색 시도 시 드롭다운 실행 함수
-	clickEvent=()=>{
-		let UserList = $searchUser.value;
-		
-		userSearchFNC(UserList);
-		
-	return false;
-	};
 	
 	// 클릭시  드롭다운 실행 함수 적용
-	$searchUser.addEventListener('click', clickEvent);
+	$searchUser.addEventListener('click', userSearchFNC);
 	
-	
-	
-	
-	$searchUser.addEventListener('keydown',(e)=>{
-		// 유저 버튼에 생긴 'on'모두 지우기
-		for(let i=0; i<$UserListBTN.length; i++){
-			$UserListBTN[i].classList.remove('on');	
-		}
 		
-		// input창에 내용 모두 지우기
-		$searchUser.value="";
-		
+			
 
-		// 아랫방향키 이벤트
-		if(e.key === "ArrowDown"&&count<$UserListBTN.length-1){
-			if(!$UserListDrop.classList.contains('show')){
-				$UserListDrop.classList.add('show');
-			}
-			count++;
-		}
-		// 윗 방향키 이벤트
-		else if(e.key === "ArrowUp"&&count>=0){
-			count--;
-			// 가장 위에까지 선택 되었을 때, 윗 방향키 동작 시
-			if(count==-1){
-				$UserListDrop.classList.remove('show');
-			}
-		}
-		
-		// 해당하는 버튼만 선택될 수 있도록 한다.
-		if(count>-1){
-			$UserListBTN[count].classList.toggle('on');
-			$searchUser.value=$UserListBTN[count].innerText;
-		}
-	
-	});
 	
 	// 드롭다운 종료 함수
 	blurEvent=()=>{
+		
 		if($UserListDrop.classList.contains('show')){
-			$UserListDrop.classList.remove('show');						
+			$UserListDrop.classList.remove('show');			
 		}
 		// 드롭다운 안에 있는 userList모두 제거
 		$UserListDrop.innerHTML="";
@@ -394,7 +368,10 @@ $(document).ready(()=>{
 			
 			<header>
 				<div id="userPlusButton"></div>
-				<input type="text" id="searchUser" placeholder="search">
+				<form id="drop" th:action="@{/chat/visit}" method="post">
+					<input type="text" id="searchUser" name="talkerName" placeholder="search">	
+				</form>
+				
 				<div class="UserListDrop" id="UserListDrop">
 			</header>
 			

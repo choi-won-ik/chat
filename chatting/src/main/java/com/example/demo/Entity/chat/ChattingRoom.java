@@ -1,5 +1,7 @@
 package com.example.demo.Entity.chat;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,9 +28,11 @@ public class ChattingRoom {
 
 	private String last;
 	
-	private String time;
+	private LocalDateTime time;
 	
-	public static ChattingRoom createRoom(String roomId,String user,String last, String time) {
-		return new ChattingRoom(null, roomId, user,last, time);
+	private int receive;
+	
+	public static ChattingRoom createRoom(String roomId,String user,String last, LocalDateTime time,int receive) {
+		return new ChattingRoom(null, roomId, user,last, time,receive);
 	}
 }

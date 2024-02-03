@@ -24,7 +24,7 @@ public class MessageListener {
             user2 = Integer.parseInt(roomId.substring(index + 1));
             System.out.println(user1);
             System.out.println(user2);
-        } 
+        }
 		
 		// kafka로 보낸 메시지를 지정주소로 뿌려줌(main채팅)
 		simpMessagingtemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);

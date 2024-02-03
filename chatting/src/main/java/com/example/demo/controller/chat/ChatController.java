@@ -17,9 +17,7 @@ import com.example.demo.service.chat.ChatService;
 @RequestMapping(value = "/chat")
 public class ChatController {
 	@Autowired
-	private ChatService chatService;
-
-	
+	private ChatService chatService;	
 	
 	// 채팅 main Page 실행
 	@GetMapping("/main")
@@ -32,28 +30,21 @@ public class ChatController {
 		for (ChattingRoom test : talkList) {
 			System.out.println(test);
 		}
+		// 좌측 채팅 리스트
 		model.addAttribute("talkList", talkList);
+		// 메시지 받기용 내 고유아이디
+		model.addAttribute("meNum",chatService.number(me));
+		
 		return "/chat/mainRoom";
 	}
-
-	// 채팅창 개설
-//	@PostMapping("/create")
-//	public String Someone(@RequestParam("talkerName")String talkerName,@AuthenticationPrincipal User user) {
-//		String me = user.getUsername();
-//		Long SomeoneUserNum = chatService.Someone(talkerName);
-//		System.out.println("여기까지 성공!!!!!!!!!!");
-//		
-//		String roomId = chatService.roomCreate(talkerName,me,SomeoneUserNum);
-//		
-//		return "redirect:/chat/room/"+roomId;
-//	}
 
 	//채팅방 방문
 	@PostMapping("/visit")
 	public String visit(@RequestParam("talkerName")String talkerName,@AuthenticationPrincipal User user) {
 		String me = user.getUsername();
 		String roomId=chatService.findRoomId(talkerName,me);
-
+		chatService.receive(roomId,me);
+		
 		return "redirect:/chat/room/"+roomId;
 	}
 
@@ -61,10 +52,6 @@ public class ChatController {
 	public String room(@PathVariable("roomId") String roomId,Model model,@AuthenticationPrincipal User user) {
 		String me = user.getUsername();
 		List<Chat> MsgList = chatService.MessagList(roomId);
-		
-		for (Chat chat : MsgList) {
-			System.out.println(chat);
-		}
 		
 		// roomId 정의
 		model.addAttribute("roomId",roomId);
@@ -74,18 +61,18 @@ public class ChatController {
 		model.addAttribute("talkList", chatService.talkList(me));
 		// db 저장된 채팅내용 출력
 		model.addAttribute("MsgList",MsgList);
+		// 안 읽은 상태에서 읽음 상태로 변경
+		model.addAttribute("receive",chatService.receive(roomId,me));
+		System.out.println(chatService.receive(roomId,me));
 		// 메시지 받기용 내 고유아이디
-		model.addAttribute("meNum",chatService.number(me));
+		Long meNum=chatService.number(me);
+		model.addAttribute("meNum",meNum);
 		
-		return "chat/room";
+		// 권한이 없는 채팅방에는 입장 불가능
+		if(chatService.proper(meNum,roomId)) {
+			return "chat/room";
+		}else {
+			return "error/chattingRoomError";
+		}
 	}
-	
-
-
-//	// 채팅방 방문
-//	@GetMapping("/room")
-//	public String getRoom(Long roomId, Model model){
-//	model.addAttribute("room",chatService.findRoomById(roomId));
-//	return "/chat/room(roomId="+roomId;
-//	}
 }

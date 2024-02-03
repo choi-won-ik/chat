@@ -52,9 +52,6 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 
-	
-	
-
 	// 모든 채팅방 List를 db에서 불러옴
 	public List<ChattingRoom> talkList(String me){
 		// db에서 내 아이디에 해당하는 roomId 가져옴
@@ -72,27 +69,33 @@ public class ChatServiceImpl implements ChatService{
 				talkList.remove(chattingRoom);
 			}
 		}
-
-		List<LocalDateTime> array = new ArrayList<>();
-		List<Integer> arr = new ArrayList<>();
+		
+		
+		// 시간순으로 list 정리
+		List<ChattingRoom> arr=new CopyOnWriteArrayList<>();
+		
 		for (ChattingRoom chattingRoom : talkList) {
-			LocalDateTime temp=LocalDateTime.parse(chattingRoom.getTime());
-			array.add(temp);
-			for (LocalDateTime localDateTime : array) {
-				int before = temp.compareTo(localDateTime);
-				 if (before < 0) {
-			            arr.add(before);
-			        }
-				 else {
-					 talkList.add(chattingRoom);
-					 array.remove(localDateTime);
-				 }
+			LocalDateTime temp=chattingRoom.getTime();
+			
+			if(arr.isEmpty()) {
+				arr.add(chattingRoom);
+			}
+			else {
+				for (int i = 0; i < arr.size(); i++) {
+					if(temp.isBefore(arr.get(i).getTime())) {
+						arr.remove(chattingRoom);
+						arr.add(i,chattingRoom);
+						
+						break;
+					}
+					arr.remove(chattingRoom);
+					arr.add(chattingRoom);
+				}
 			}
 		}
 		
-		return talkList;
+		return arr;
 	}
-
 
 	@Override
 	public String findRoomId(String talkerName, String me) {
@@ -122,5 +125,48 @@ public class ChatServiceImpl implements ChatService{
 		return memberRepository.findIdByUserid(me);
 	}
 
+	@Override
+	public boolean proper(Long meNum,String roomId) {
+		int user1 = 0;
+		int user2 = 0;
+		
+		
+        // & 이전의 내용을 없애기
+        int index = roomId.indexOf("&");
+        if (index != -1) {
+            user1 = Integer.parseInt(roomId.substring(0, index));
+            user2 = Integer.parseInt(roomId.substring(index + 1));
+        }
+        
+        if(user1==meNum || user2==meNum) {
+        	return true;
+        }
+        else  {
+        	return false;
+        }
 
+	}
+
+	@Override
+	public int receive(String roomId, String me) {
+		CopyOnWriteArrayList<ChattingRoom> arr = chatRoomRepository.findByRoomId(roomId);
+		
+		
+		// 나에 해당하는 chattingRoom을 불러옴
+		for (ChattingRoom chattingRoom : arr) {
+			if(chattingRoom.getUser()==me) {
+				update(chattingRoom);
+			}
+		}
+		
+		return 0;
+	}
+	
+	@Transactional
+	public void update(ChattingRoom room) {
+		// 읽은 상태인 0으로 변경
+		room.setReceive(0);
+		
+		chatRoomRepository.save(room);
+	}
 }
