@@ -31,7 +31,7 @@
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+index.user+"</h2>";
-				if(receive===1){
+				if(index.receive===1){
 					str += "<span class='receive'></span>";
 				}
 				str += "<h3>"+index.last+"</h3></label></button></form>";
@@ -95,7 +95,6 @@
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
-				str += "<span class='receive'></span>";
 				str += "<h3>"+message+"</h3></label></button></form>";
 				$('#chattingList').prepend(str);
 			}

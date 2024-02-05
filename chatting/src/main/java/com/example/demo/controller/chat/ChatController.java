@@ -43,7 +43,7 @@ public class ChatController {
 	public String visit(@RequestParam("talkerName")String talkerName,@AuthenticationPrincipal User user) {
 		String me = user.getUsername();
 		String roomId=chatService.findRoomId(talkerName,me);
-		chatService.receive(roomId,me);
+//		chatService.receive(roomId,me);
 		
 		return "redirect:/chat/room/"+roomId;
 	}

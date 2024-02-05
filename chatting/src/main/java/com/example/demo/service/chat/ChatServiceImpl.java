@@ -19,9 +19,11 @@ import com.example.demo.repository.member.MemberRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService{
 	@Autowired
 	private ChatRoomRepository chatRoomRepository;
@@ -151,10 +153,9 @@ public class ChatServiceImpl implements ChatService{
 	public int receive(String roomId, String me) {
 		CopyOnWriteArrayList<ChattingRoom> arr = chatRoomRepository.findByRoomId(roomId);
 		
-		
 		// 나에 해당하는 chattingRoom을 불러옴
 		for (ChattingRoom chattingRoom : arr) {
-			if(chattingRoom.getUser()==me) {
+			if(chattingRoom.getUser().equals(me)) {
 				update(chattingRoom);
 			}
 		}

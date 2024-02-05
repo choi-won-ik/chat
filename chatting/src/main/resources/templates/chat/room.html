@@ -29,7 +29,7 @@
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+index.user+"</h2>";
-				if(receive===1){
+				if(index.receive===1){
 					str += "<span class='receive'></span>";
 				}
 				str += "<h3 id='lastMsg_"+talkerName+"'>"+index.last+"</h3></label></button></form>";
@@ -58,6 +58,7 @@
 					$("#chat").append(str);
 			}
 		});
+		
 		
 
 	};
@@ -177,7 +178,6 @@
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
-				str += "<span class='receive'></span>";
 				str += "<h3>"+message+"</h3></label></button></form>";
 				$('#chattingList').prepend(str);
 			}
@@ -222,6 +222,7 @@
 	
 	// ENTER키 눌렀을 때 메시지 보내기
 	enterSend=(e)=>{
+		
 		let msg = document.getElementById('msg');
 		
 		if (e.key === "Enter") {
@@ -248,16 +249,82 @@ $(document).ready(()=>{
 	// 클래스 명을 변경가능하게 하기위해 var을 사용
 	let $UserListDrop = document.getElementById("UserListDrop");
 	// 드롭다운 각각의 list의 버튼태그
-	let $UserListBTN=document.getElementsByClassName('UserList');
+	let $UserListBTN=UserListDrop.getElementsByClassName('UserList');
 	
+	var $UserListCLA=[];
 	// 방향키 카운터
-	let count = 0;
+	let count = -1;
+	let countSave = -1;
+	let option="" ;
+	let optionSave="";
+	
+	const countON=(count,option)=>{
+		
+		
+		// 마우스 이벤트 시 포커스 이동
+		if(option==="mouse"){
+			// 마우스 오버 이벤트를 시작했을 때, 모든 포커스 제거
+			if(option!==optionSave){
+				// key이벤트와 마우스 이벤트를 연결시킴(최초 마우스 이벤트)
+				for(let i=0; i<$UserListBTN.length; i++){
+					$UserListBTN[i].classList.remove('on');
+				}
+			}
+			
+			// 마우스가 over된 상태에서 이동했을 시, 포커스 이동
+			else if(option===optionSave){
+				$UserListBTN[countSave].classList.remove('on');
+			}
+			
+			countSave=count;
+		}
+		// 방향키 이벤트 시 포커스 이동
+		else if(option==="key"){
+			// 드롭다운이 실행되어 있지 않다면
+			if(countSave===-1&&count===1&&!$UserListDrop.classList.contains('show')){
+				$UserListDrop.classList.toggle('show');
+			}
+			// 키 입력 시 이전에 맞춰져 있던 포커스 해제
+			if(countSave>-1){
+				$UserListBTN[countSave].classList.remove('on');
+			}
+			
+			countSave=countSave+count;
+			if(countSave>$UserListBTN.length-1){
+				countSave=$UserListBTN.length-1;
+			}
+			else if(countSave<0){
+				$UserListDrop.classList.remove('show');
+				countSave=-1;
+			}
+		}
+		// input에서 포커스가 아웃 되었을 때
+		else if(option==="reset"){
+			countSave=count;
+			
+			for(let i=0; i<$UserListBTN.length; i++){
+				$UserListBTN[i].classList.remove('on');
+			}
+		}
+
+		// 같은 이벤트 발생 시 반복문이 다시 동작하지 않도록 함.
+		optionSave=option;
+		
+		// 이벤트가 실행될 때, 메뉴에 포커스가 맞춰짐
+		if(countSave>=0){
+			$UserListBTN[countSave].classList.add('on');
+			
+			// input창에 유저명 입력
+			$searchUser.value=$UserListBTN[countSave].innerText;
+		}
+	};
+
 	
 	// 좌측 검색창에서 user 검색
-	const userSearchFNC=()=>{
+	const userSearchFNC=(UserList)=>{
+		$UserListDrop.innerHTML="";
+		
 		// input창에 있는 유저명을 ajax로 db에서 검색
-		let UserList=$searchUser.value;
-		console.log(UserList);
 		$.ajax({
 			type : 'POST',
 			url : "/chat/UserList",
@@ -281,81 +348,81 @@ $(document).ready(()=>{
 				});
 				
 				// 드롭다운 각각의 list의 클레스
-				let $UserListCLA = document.querySelectorAll('.UserList');
+				$UserListCLA = document.querySelectorAll('.UserList');
 				
-				console.log($UserListCLA.length);
+				
 				
 				for(let i=0; i<$UserListCLA.length; i++){
 					// 드롭다운 메뉴에 마우스 오버했을 때
 					$UserListBTN[i].addEventListener('mouseover',()=>{
-						if($UserListBTN[i].classList.contains('on')){
-							$UserListBTN[i].classList.remove('on');
-						}
-						console.log("마우스 오버");
+						option= "mouse";
+						countON(i,option);
 					});
-					
-					// 드롭다운 메뉴에 마우스 아웃했을 때
-					$UserListBTN[i].addEventListener('mouseout',()=>{
-						console.log("마우스 아웃");
-					});
+
 				}
-				
 			},
 			error :()=>{
 				alert("알 수 없는 오류");
 			}
 		})
 	};
-
 		
-		
-		
-
+	keyEvent=(e)=>{
+		// 아랫방향키를 입력했을 때
+		if(e.key === "ArrowDown"){
+			// input창의 내용을 모두 제거
+			$searchUser.value="";
 			
+			count=1;
+			option="key";
 			
-			$searchUser.addEventListener('keydown',(e)=>{
-				// 아랫방향키를 입력했을 때
-				if(e.key === "ArrowDown"){
-					// input창의 내용을 모두 제거
-					$searchUser.value="";
-					console.log("down");
-				}
-				//윗 방향키를 입력했을 때
-				else if(e.key=== "ArrowUp"){
-					$searchUser.value="";
-					console.log("up");
-				}
-				else if(e.keyCode === 13){
-					console.log("enter키 버튼");
-				}
-				else{
-					$searchUser.addEventListener(input,()=>{
-						console.log("글자 입력");
-					});
-				}
-			});
+		}
+		//윗 방향키를 입력했을 때
+		else if(e.key=== "ArrowUp"){
+			$searchUser.value="";
 			
+			count=-1;
+			option="key";
+		}
+		else if(e.keyCode === 13){
+			console.log("enter키 버튼");
+			document.getElementById('drop').onsubmit(); 
+		}
+		else{
+			return false;
+		}
+		countON(count,option);
 		
+	};
+	
 	
 	// 클릭시  드롭다운 실행 함수 적용
-	$searchUser.addEventListener('click', userSearchFNC);
-	
+	$searchUser.addEventListener('focus', ()=>{
+		userSearchFNC($searchUser.value);
 		
-			
-
+		// 키 이벤트 실행
+		$searchUser.addEventListener('keydown',keyEvent);
+		
+		// input 이벤트 실행
+		$searchUser.addEventListener('input', ()=>{
+			userSearchFNC($searchUser.value);
+		});
+		
+	});
 	
-	// 드롭다운 종료 함수
-	blurEvent=()=>{
+	
+	
+	// 드롭다운 종료
+	$searchUser.addEventListener('blur',()=>{
+		$searchUser.removeEventListener('keydown',keyEvent);
 		
 		if($UserListDrop.classList.contains('show')){
 			$UserListDrop.classList.remove('show');			
 		}
+		countON(-1,"reset")
 		// 드롭다운 안에 있는 userList모두 제거
 		$UserListDrop.innerHTML="";
-	};
-	
-	// 드롭다운 종료
-	$searchUser.addEventListener('blur', blurEvent);
+	});
 
 });
 </script>

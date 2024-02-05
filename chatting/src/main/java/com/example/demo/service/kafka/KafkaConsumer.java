@@ -49,27 +49,31 @@ public class KafkaConsumer {
 		Chat chat = Chat.messageText(message.getRoomId(),message.getWriter(), message.getMessage(), message.getTimestamp());
 		kafkaRepository.save(chat);
 		messageListener.listen(message);
-		System.out.println("Received message: 도대체 뭐가 출력되는 거냐?" + message);
-		
 		
 		
 		// 대화상대 식별
 		String roomId = message.getRoomId().replace("&", "");
 		roomId = roomId.replace(String.valueOf(memberRepository.findIdByUserid(message.getWriter())),"");
-		Long talkerName = Long.parseLong(roomId);
-		String talkerNum = memberRepository.findUserById(talkerName);
+		Long talkerNum = Long.parseLong(roomId);
+		String tlakerName = memberRepository.findUserById(talkerNum);
 		
-		
-		// 메시지를 보낸 사람으로 db저장
-		ChattingRoom chattingRoom = ChattingRoom.createRoom(message.getRoomId(), message.getWriter(), message.getMessage(),time,1);
+		// 채팅창의 메시지를 보낸 사람
+		ChattingRoom chattingRoomMe = ChattingRoom.createRoom(message.getRoomId(), message.getWriter(), message.getMessage(),time,0);
+		// 채팅창의 메시지를 보낸 사람
+		ChattingRoom chattingRoomYou = ChattingRoom.createRoom(message.getRoomId(), tlakerName, message.getMessage(),time,1);
 		List<ChattingRoom> list=chatRoomRepository.findByRoomId(message.getRoomId());
+		// roomId에 해당하는 채팅방에 존재하지 않을 시
 		if(list.isEmpty()) {
-			chatRoomRepository.save(chattingRoom);
-			// 메시지를 받은 사람으로 db저장
-			chatRoomRepository.save(ChattingRoom.createRoom(message.getRoomId(),talkerNum,message.getMessage(),time,1));
-		}else {
-			update(list,time,message.getMessage());
+			// 메시지 보낸 사람으로 db저장
+			chatRoomRepository.save(chattingRoomMe);
+			// 메시지 보낸 사람으로 db저장
+			chatRoomRepository.save(chattingRoomYou);
 		}
+		// roomId에 해당하는 채팅방에 존재할 시
+		else {
+			update(list,time,message.getMessage(),message.getWriter());
+		}
+		System.out.println("Received message: 도대체 뭐가 출력되는 거냐?" + chattingRoomYou);
 	}	
 	
 	
@@ -77,10 +81,16 @@ public class KafkaConsumer {
 
 	// db에 해당 채팅 리스트가 있을 시 시간만 업데이트 시킴.
 	@Transactional
-	public void update(List<ChattingRoom> list,LocalDateTime time,String last) {
+	public void update(List<ChattingRoom> list,LocalDateTime time,String last,String me) {
 		for (ChattingRoom room : list) {
-			room.setTime(time);
+			// 마지막 채팅 업데이트
 			room.setLast(last);
+			// 마지막 채팅 시간 업데이트
+			room.setTime(time);
+			// 읽음 상태 업데이트
+			if(!room.getUser().equals(me)) {
+				room.setReceive(1);
+			}
 			
 			chatRoomRepository.save(room);
 		}
