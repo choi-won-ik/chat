@@ -12,8 +12,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.dto.chat.ChatMessageDTO;
+import com.example.demo.dto.kafka.KafkaConstants;
 
 @EnableKafka
 @Configuration

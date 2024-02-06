@@ -155,7 +155,7 @@ public class ChatServiceImpl implements ChatService{
 		
 		// 나에 해당하는 chattingRoom을 불러옴
 		for (ChattingRoom chattingRoom : arr) {
-			if(chattingRoom.getUser().equals(me)) {
+			if(!chattingRoom.getUser().equals(me)) {
 				update(chattingRoom);
 			}
 		}

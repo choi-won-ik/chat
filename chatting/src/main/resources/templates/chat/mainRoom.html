@@ -14,7 +14,6 @@
 	let me = /*[[${me}]]*/"";
 	let talkList=/*[[${talkList}]]*/[];
 	let meNum = /*[[${meNum}]]*/ "";
-	let receive = /*[[${receive}]]*/ "";
 </script>
 <script>
 	window.onload=()=>{
@@ -22,8 +21,6 @@
 		
 		// db에서 chattingRoom List 가져오기
 		talkList.forEach((index)=>{
-			
-			
 			// 좌측 대화 list 정의
 			let str = "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
 				str += "<input type='hidden' name='talkerName' value='"+index.user+"'>"
@@ -44,11 +41,11 @@
 	};
 	
 	window.onunload=()=>{
-		const $inputBox = document.querySelector('.input_box');
+		const $inputBox = document.getElementById('input_box');
 		let $ModalUserList = document.getElementById('ModalUserList');
 		if($ModalUserList){
-			// 모달에 발생된 이벤트 종료
-			$inputBox.removeEventListener('input',inputBoxFunction);
+//			// 모달에 발생된 이벤트 종료
+//			$inputBox.removeEventListener('input',inputBoxFunction);
 			// 모달에 있는 userList를 제거
 			while ($ModalUserList.firstChild) {
 				$ModalUserList.removeChild($ModalUserList.firstChild);
@@ -141,6 +138,7 @@
 				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
 				str += "<label id='deleteTag'>";
 				str += "<h2 id='talkUserName'>"+writer+"</h2>";
+				str += "<span class='receive'></span>";
 				str += "<h3>"+message+"</h3></label></button></form>";
 				$('#chattingList').prepend(str);
 			}

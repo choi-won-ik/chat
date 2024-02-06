@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.Entity.chat.Chat;
 import com.example.demo.Entity.chat.ChattingRoom;
-import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.domain.kafka.MessageListener;
 import com.example.demo.dto.chat.ChatMessageDTO;
+import com.example.demo.dto.kafka.KafkaConstants;
 import com.example.demo.repository.chat.ChatRepository;
 import com.example.demo.repository.chat.ChatRoomRepository;
 import com.example.demo.repository.member.MemberRepository;
@@ -58,9 +58,9 @@ public class KafkaConsumer {
 		String tlakerName = memberRepository.findUserById(talkerNum);
 		
 		// 채팅창의 메시지를 보낸 사람
-		ChattingRoom chattingRoomMe = ChattingRoom.createRoom(message.getRoomId(), message.getWriter(), message.getMessage(),time,0);
+		ChattingRoom chattingRoomMe = ChattingRoom.createRoom(message.getRoomId(), message.getWriter(), message.getMessage(),time,1);
 		// 채팅창의 메시지를 보낸 사람
-		ChattingRoom chattingRoomYou = ChattingRoom.createRoom(message.getRoomId(), tlakerName, message.getMessage(),time,1);
+		ChattingRoom chattingRoomYou = ChattingRoom.createRoom(message.getRoomId(), tlakerName, message.getMessage(),time,0);
 		List<ChattingRoom> list=chatRoomRepository.findByRoomId(message.getRoomId());
 		// roomId에 해당하는 채팅방에 존재하지 않을 시
 		if(list.isEmpty()) {
@@ -88,7 +88,7 @@ public class KafkaConsumer {
 			// 마지막 채팅 시간 업데이트
 			room.setTime(time);
 			// 읽음 상태 업데이트
-			if(!room.getUser().equals(me)) {
+			if(room.getUser().equals(me)) {
 				room.setReceive(1);
 			}
 			

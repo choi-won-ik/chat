@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.dto.chat.ChatMessageDTO;
+import com.example.demo.dto.kafka.KafkaConstants;
 
 @CrossOrigin
 @Controller

@@ -18,15 +18,19 @@ import lombok.NoArgsConstructor;
 public class Chat {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(unique = true, nullable = false)
 	private Long id;
 	
-	@Column(name="roomid")
+	@Column(name="roomid", nullable = false)
 	private String roomId;
 	
+	@Column(length = 11, nullable = false)
 	private String writer;
 	
+	@Column(nullable = false)
 	private String message;
 	
+	@Column(nullable = false)
 	private String timestamp;
 	
 	public static Chat messageText(String roomId,String writer,String message,String timestamp) {

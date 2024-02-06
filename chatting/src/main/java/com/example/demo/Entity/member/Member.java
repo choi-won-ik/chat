@@ -14,16 +14,16 @@ import lombok.NoArgsConstructor;
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false, length = 11)
     private String userid;
 
+    @Column(nullable = false, length = 100)
     private String pw;
 
-    private String roles;
-
     public static Member createUser(String userId, String pw, PasswordEncoder passwordEncoder) {
-        return new Member(null, userId, passwordEncoder.encode(pw), "USER");
+        return new Member(null, userId, passwordEncoder.encode(pw));
     }
 }

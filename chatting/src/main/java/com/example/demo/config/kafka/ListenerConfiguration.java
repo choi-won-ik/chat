@@ -13,8 +13,8 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import com.example.demo.domain.kafka.KafkaConstants;
 import com.example.demo.dto.chat.ChatMessageDTO;
+import com.example.demo.dto.kafka.KafkaConstants;
 
 @EnableKafka
 @Configuration
