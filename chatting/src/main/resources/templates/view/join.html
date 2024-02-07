@@ -5,7 +5,37 @@
 <title>Insert title here</title>
 </head>
 <link th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css}" rel="stylesheet">
-    <link th:href="@{https://getbootstrap.com/docs/4.0/examples/signin/signin.css}" rel="stylesheet">
+<link th:href="@{https://getbootstrap.com/docs/4.0/examples/signin/signin.css}" rel="stylesheet">
+<script>
+	window.onload=()=>{
+		const form = document.getElementById('join_form');
+
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+
+			const data = new FormData(form);
+			const param = JSON.stringify(Object.fromEntries(data));
+
+			fetch('/auth/join', {
+				method: 'POST',
+				body: param,
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+			.then(response => {
+				debugger;
+				if (response.status == 200) {
+					window.location.href = '/view/login';
+					alert("회원가입 성공")
+				} else {
+					alert("이미 존재하는 아이디 입니다.")
+				}
+			})
+			.catch(error => console.log(error))
+		});
+	};
+</script>
 <body>
 <div class="container">
     <form class="form-signin" id='join_form'>
@@ -23,32 +53,7 @@
     </form>
 
 <script>
-	const form = document.getElementById('join_form');
 
-	form.addEventListener('submit', e => {
-		e.preventDefault();
-
-		const data = new FormData(form);
-		const param = JSON.stringify(Object.fromEntries(data));
-
-		fetch('/auth/join', {
-			method: 'POST',
-			body: param,
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		})
-			.then(response => {
-				debugger;
-				if (response.status == 200) {
-					window.location.href = '/view/login';
-					alert("회원가입 성공")
-				} else {
-					alert("이미 존재하는 아이디 입니다.")
-				}
-			})
-			.catch(error => console.log(error))
-	});
 </script>
 </div>
 </body>

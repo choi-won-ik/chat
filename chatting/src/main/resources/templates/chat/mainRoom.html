@@ -40,6 +40,8 @@
 		});
 	};
 	
+	
+	
 	window.onunload=()=>{
 		const $inputBox = document.getElementById('input_box');
 		let $ModalUserList = document.getElementById('ModalUserList');
@@ -304,11 +306,10 @@ $(document).ready(()=>{
 			<header>
 				<div id="userPlusButton"></div>
 			</header>
-			<!-- 왼쪽 대화상대 창 -->
 			
-				
+			
+			<!-- 왼쪽 대화상대 창 -->	
 			<ul class='chattingList' id='chattingList'></ul>
-				
 
 			
 		</aside>
@@ -321,9 +322,9 @@ $(document).ready(()=>{
 			<div class="body" style="position: absolute; top: 35%; left: 50%;">
 				<div id="chatHome" style="text-align: center;">
 					
-					<div id="userPlus">
-						<img src="/img/chat/message_4410964.png" class="MsgImg" style="width:100px; height:100px;" alt="">
-					</div>
+					<button style="border: none; cursor: pointer; background-color: #eff3f7;" id="userPlus">
+						<img src="/img/chat/message_4410964.png" class="MsgImg" onclick="location.href='/view/dashboard'" style="width:110px; height:110px;" alt="">
+					</button>
 					<div>
 						<button class="btn-hover color-9" id="add-btn">대화상대 추가</button>
 					</div>

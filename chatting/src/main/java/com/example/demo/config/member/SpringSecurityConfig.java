@@ -34,6 +34,7 @@ public class SpringSecurityConfig {
                         .usernameParameter("userid")						// submit할 아이디
                         .passwordParameter("pw")							// submit할 비밀번호
                         .defaultSuccessUrl("/view/dashboard", true)			// 성공 시 '/view/dashboard'로 이동
+                        .failureUrl("/view/loginError")						// 로그인 실패 시
                         .permitAll()
                 )
                 .logout(withDefaults());									// 로그아웃은 기본설정으로 (/logout으로 인증해제)

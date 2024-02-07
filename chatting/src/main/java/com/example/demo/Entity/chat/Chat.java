@@ -21,7 +21,7 @@ public class Chat {
 	@Column(unique = true, nullable = false)
 	private Long id;
 	
-	@Column(name="roomid", nullable = false)
+	@Column(name="roomid",length = 20, nullable = false)
 	private String roomId;
 	
 	@Column(length = 11, nullable = false)

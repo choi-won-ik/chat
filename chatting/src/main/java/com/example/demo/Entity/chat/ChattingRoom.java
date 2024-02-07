@@ -1,3 +1,4 @@
+
 package com.example.demo.Entity.chat;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ public class ChattingRoom {
 	private Long id;
 	
 	// 채팅방의 코드 ex)3+2
-	@Column(nullable = false)
+	@Column(name="roomid",nullable = false,length = 20)
 	private String roomId;
 	
 	@Column(length = 11, nullable = false)

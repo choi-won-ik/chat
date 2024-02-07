@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <title>로그인</title>
-    <link th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css}"
-      rel="stylesheet">
-    <link th:href="@{https://getbootstrap.com/docs/4.0/examples/signin/signin.css}" rel="stylesheet" crossorigin="anonymous">
-    
+<title>로그인</title>
+<link th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css}" rel="stylesheet">
+<link th:href="@{https://getbootstrap.com/docs/4.0/examples/signin/signin.css}" rel="stylesheet" crossorigin="anonymous">
 </head>
+<script>
+	window.onload=()=>{
+		const $form=document.getElementById('form');
+        
+        $form.addEventListener('submit', () => {
+			sessionStorage.setItem('userid', document.getElementById('username').value);
+        });
+	};
+</script>
 <body>
 <div class="container">
     
-	<form class="form-signin" th:action="@{/login-process}" method="post">
+	<form class="form-signin" id="form" th:action="@{/login-process}" method="post">
         <p class="text-center">
             <img src="/img/msg.png" class="img-thumbnail" style="width: 200px;" alt="이 글이 보인다면 시큐리티 설정 잘못한거임!">
         </p>
@@ -29,14 +36,6 @@
 	<form class="form-signin" th:action="@{/view/join}" method="get">
         <button class="btn btn-lg btn-warning btn-block" type="submit">회원가입하기</button>
     </form>
-
-    <script>
-        const loginBtn = document.getElementById('login_btn');
-
-        loginBtn.addEventListener('click', () => {
-            sessionStorage.setItem('userid', document.getElementById('username').value);
-        });
-    </script>
 </div>
 </body>
 </html>

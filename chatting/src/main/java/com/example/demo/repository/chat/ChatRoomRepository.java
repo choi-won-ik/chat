@@ -12,7 +12,7 @@ import com.example.demo.Entity.chat.ChattingRoom;
 public interface ChatRoomRepository extends JpaRepository<ChattingRoom, Long>{
 	
 	@Query(
-			value= "SELECT room_id from chattingroom WHERE user = :me",
+			value= "SELECT roomid from chattingroom WHERE user = :me",
 			nativeQuery  = true
 			)
 	List<String> findRoomIdByUser(@Param("me") String me);

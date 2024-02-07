@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/view")
-
 public class ViewController {
 
 	@GetMapping("/login")
-	public String loginPage() {
+	public String loginPage() {	
 		return "view/login";
 	}
 
@@ -27,5 +26,10 @@ public class ViewController {
 	@GetMapping("/join")
 	public String joinPage() {
 		return "view/join";
+	}
+	
+	@GetMapping("/loginError")
+	public String loginError() {
+		return "view/loginError";
 	}
 }
