@@ -298,7 +298,7 @@ $(document).ready(()=>{
 		// input에서 포커스가 아웃 되었을 때
 		else if(option==="reset"){
 			countSave=count;
-			
+
 			for(let i=0; i<$UserListBTN.length; i++){
 				$UserListBTN[i].classList.remove('on');
 			}
@@ -310,13 +310,13 @@ $(document).ready(()=>{
 		// 이벤트가 실행될 때, 메뉴에 포커스가 맞춰짐
 		if(countSave>=0){
 			$UserListBTN[countSave].classList.add('on');
-			
+
 			// input창에 유저명 입력
 			$searchUser.value=$UserListBTN[countSave].innerText;
 		}
 	};
 
-	
+
 	// 좌측 검색창에서 user 검색
 	const userSearchFNC=(UserList)=>{
 		$UserListDrop.innerHTML="";
@@ -336,7 +336,7 @@ $(document).ready(()=>{
 					if(!$UserListDrop.classList.contains('show')&&item.userid!==null){
 						$UserListDrop.classList.add('show');						
 					}
-					
+
 					// 드롭다운이 실행되면 userList출력
 					if($UserListDrop.classList.contains('show')){
 						let str = "<button class='UserList'>"+item.userid+"</button>";
@@ -348,15 +348,16 @@ $(document).ready(()=>{
 				$UserListCLA = document.querySelectorAll('.UserList');
 				
 				
-				
+				// 마우스 이벤트용 반복문
 				for(let i=0; i<$UserListCLA.length; i++){
 					// 드롭다운 메뉴에 마우스 오버했을 때
 					$UserListBTN[i].addEventListener('mouseover',()=>{
 						option= "mouse";
 						countON(i,option);
 					});
-
 				}
+				
+
 			},
 			error :()=>{
 				alert("알 수 없는 오류");
@@ -394,37 +395,37 @@ $(document).ready(()=>{
 	
 	
 	// 클릭시  드롭다운 실행 함수 적용
-	$searchUser.addEventListener('focus', ()=>{
-		userSearchFNC($searchUser.value);
-		
-		// 키 이벤트 실행
-		$searchUser.addEventListener('keydown',keyEvent);
-		
-		// input 이벤트 실행
-		$searchUser.addEventListener('input', ()=>{
-			userSearchFNC($searchUser.value);
-		});
-		
-	});
-	
-	
+//	$searchUser.addEventListener('click', (event)=>{});
 	
 	// 드롭다운 종료
-	$searchUser.addEventListener('blur',()=>{
-		$searchUser.removeEventListener('keydown',keyEvent);
+	document.addEventListener('click',(event)=>{
 		
-		if($UserListDrop.classList.contains('show')){
-			$UserListDrop.classList.remove('show');			
+		// 드롭다운 메뉴를 클릭하였을 경우
+		if(event.target.classList.contains('UserList')){
+			$UserListDrop.classList.remove('show');
+			$searchUser.focus();
 		}
-		countON(-1,"reset")
-		// 드롭다운 안에 있는 userList모두 제거
-		$UserListDrop.innerHTML="";
+		// 검색창을 클릭하였을 경우
+		else if(event.target===$searchUser){
+			userSearchFNC($searchUser.value);
+			
+			// 키 이벤트 실행
+			$searchUser.addEventListener('keydown',keyEvent);
+			
+			// input 이벤트 실행
+			$searchUser.addEventListener('input', ()=>{
+				userSearchFNC($searchUser.value);
+			});
+		}
+		else{
+			$UserListDrop.classList.remove('show');
+			// 드롭다운 리셋
+			countON(-1,"reset")
+			$searchUser.focus();
+		}
 	});
-
 });
 </script>
-
-
 
 <body>
 	<div class="chat_container" style="background-color: #eff3f7;">
