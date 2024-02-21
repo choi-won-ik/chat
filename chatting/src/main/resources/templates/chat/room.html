@@ -203,36 +203,37 @@
 
 	// 버튼 클릭 시 메시지 보내기
 	sendBTN=()=>{
-		let msg = document.getElementById('msg');
+		let $msg = document.getElementById('msg');
+		if($msg.value!==""){
+			console.log(me + ":" + $msg.value);
+			stomp.send(
+				'/pub/chat/message',
+				{},
+				JSON.stringify({roomId: roomId, message: $msg.value, writer: me})
+			);
+			$msg.value = '';
+		}
 		
-		
-		console.log(me + ":" + msg.value);
-		stomp.send(
-			'/pub/chat/message',
-			{},
-			JSON.stringify({roomId: roomId, message: msg.value, writer: me})
-		);
-		msg.value = '';
-		
+		$msg.focus();
 		return false;
 	};
 	
 	// ENTER키 눌렀을 때 메시지 보내기
 	enterSend=(e)=>{
 		
-		let msg = document.getElementById('msg');
+		let $msg = document.getElementById('msg');
 		
 		if (e.key === "Enter") {
 			e.preventDefault();
 
-			console.log(me + ":" + msg.value);
+			console.log(me + ":" + $msg.value);
 			stomp.send(
 				'/pub/chat/message', 
 				{}, 
-				JSON.stringify({roomId: roomId, message: msg.value, writer: me})
+				JSON.stringify({roomId: roomId, message: $msg.value, writer: me})
 			);
 			
-			msg.value = '';
+			$msg.value = '';
 		}
 		return false;
 	};
@@ -256,7 +257,6 @@ $(document).ready(()=>{
 	let optionSave="";
 	
 	const countON=(count,option)=>{
-		
 		
 		// 마우스 이벤트 시 포커스 이동
 		if(option==="mouse"){
@@ -315,7 +315,6 @@ $(document).ready(()=>{
 			$searchUser.value=$UserListBTN[countSave].innerText;
 		}
 	};
-
 
 	// 좌측 검색창에서 user 검색
 	const userSearchFNC=(UserList)=>{
@@ -393,7 +392,6 @@ $(document).ready(()=>{
 		
 	};
 	
-	
 	// 클릭시  드롭다운 실행 함수 적용
 //	$searchUser.addEventListener('click', (event)=>{});
 	
@@ -404,7 +402,7 @@ $(document).ready(()=>{
 		if(event.target.classList.contains('UserList')){
 			$UserListDrop.classList.remove('show');
 			$searchUser.focus();
-		}
+		} 
 		// 검색창을 클릭하였을 경우
 		else if(event.target===$searchUser){
 			userSearchFNC($searchUser.value);
@@ -416,6 +414,8 @@ $(document).ready(()=>{
 			$searchUser.addEventListener('input', ()=>{
 				userSearchFNC($searchUser.value);
 			});
+		}else if(event.target===document.getElementById('msg')||event.target===document.getElementById('dm')){
+			return false;
 		}
 		else{
 			$UserListDrop.classList.remove('show');
