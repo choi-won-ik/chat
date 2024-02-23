@@ -30,14 +30,15 @@
     - 모달 및 드롭다운으로 채팅할 유저 검색
 
 #### 채팅페이지
-![개인 채팅 페이지](https://github.com/choi-won-ik/chat/assets/140231082/3ff3418d-a0d7-4138-8bef-82e685bbb553)
+![chat](https://github.com/choi-won-ik/chat/assets/140231082/f3baac69-3e5e-4956-b837-0fe2df49f3d5)
 
 #### Database EDR
 
 
 
 
-https://github.com/choi-won-ik/chat/assets/140231082/4a490b21-d2ad-43bd-b366-d2fe2ff68bc8
+
+
 
 
 
