@@ -31,10 +31,11 @@
 
 #### 채팅페이지
 
-https://github.com/choi-won-ik/chat/assets/140231082/6ea2e6ce-3cca-45b8-87c4-221ac975b3f9
+![chat](https://github.com/choi-won-ik/chat/assets/140231082/1b938813-4b17-4c4c-a8b5-a1c7fe4032ef)
 
 
 #### Database EDR
+
 
 
 
