@@ -33,22 +33,9 @@
 
 ![chat](https://github.com/choi-won-ik/chat/assets/140231082/1b938813-4b17-4c4c-a8b5-a1c7fe4032ef)
 
-
 #### Database EDR
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+![chatting erd](https://github.com/choi-won-ik/chat/assets/140231082/f65fb229-9f37-4f69-8f73-7a4775fbbfc5)
 
 
 채팅페이지 입니다.
