@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+</head>
+<link th:href="@{/css/chatting.css}" rel="stylesheet">
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js}"></script>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js}"></script>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js}"></script>
+<script th:inline="javascript">			//대화상대와 roomId를 var로 받아오는 스크립트
+	let talkerName = /*[[${talkerName}]]*/ "";
+	let roomId = /*[[${roomId}]]*/ "";
+	let me = sessionStorage.getItem('userid');
+	let talkList=/*[[${talkList}]]*/[];
+	let messageList = /*[[${MsgList}]]*/[];
+	let meNum = /*[[${meNum}]]*/ "";
+</script>
+
+<script>
+	window.onload=()=>{
+		// db에서 좌측 채팅List 가져오기
+		talkList.forEach((index)=>{
+			// side 채팅리스트 정의
+			let str = "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input type='hidden' name='talkerName' value='"+index.user+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+index.user+"</h2>";
+				if(index.receive===1){
+					str += "<span class='receive'></span>";
+				}
+				str += "<h3 id='lastMsg_"+talkerName+"'>"+index.last+"</h3></label></button></form>";
+			$('.chattingList').prepend(str);
+		});
+
+		// main채팅 내역을 db에서 가져옴
+		messageList.forEach((index)=>{
+			if(index.writer===me){
+				let str = "<li class='me'>";
+					str += "<div class='entete'>";
+					str += "<h2>"+index.writer+"</h2></div>";
+					str += "<h3>"+index.timestamp+" </h3>";
+					str += "<div class='message'>";
+					str += "<b>" + index.message+ "</b>";
+					str += "</div></li>";
+				$("#chat").append(str);
+			}
+			else{
+				let str = "<li class='you'>";
+					str += "<div class='entete'>";
+					str += "<h2>"+index.writer+"</h2></div>";
+					str += "<div class='message'>";
+					str += "<b>" +index.message+ "</b></div>";
+					str += "<h3>"+index.timestamp+" </h3></li>";
+					$("#chat").append(str);
+			}
+		});
+
+	};
+	
+	window.onunload=()=>{
+		// 좌측 유저명 검색 input
+		let $searchUser = document.getElementById("searchUser");
+	};
+	
+</script>
+
+
+<script>
+	// 새로운 채팅을 append하기 위해
+	const $chat = document.getElementById('chat');
+	
+	
+	let sockJs = new SockJS("/ws-stomp");
+	//1. SockJS를 내부에 들고있는 stomp를 내어줌
+	let stomp = Stomp.over(sockJs);
+
+
+    //2. main채팅창 connection이 맺어지면 실행
+	stomp.connect({},()=>{
+		
+		//4. subscribe(path, callback)으로 메세지를 받을 수 있음
+		stomp.subscribe("/sub/chat/room/"+roomId, (chat) => {
+			
+			let content = JSON.parse(chat.body);
+
+			let str = '';
+			let writer = content.writer;
+			let message = content.message;
+			let timestamp = content.timestamp;
+			if(message===''){
+				return;
+			}else{
+				if(writer === me){
+					str = "<li class='me'>";
+					str += "<div class='entete'>";
+					str += "<h2>"+writer+"</h2></div>";
+					str += "<h3>"+timestamp+"</h3>";
+					str += "<div class='message'>";
+					str += "<b>"+message+"</b>";
+					str += "</div></li>";
+					$('#chat').append(str);
+				}
+				else{
+					str = "<li class='you'>";
+					str += "<div class='entete'>";
+					str += "<h2>"+writer+"</h2></div>";
+					str += "<div class='message'>";
+					str += "<b>"+message+"</b></div>";
+					str += "<h3>"+timestamp+"</h3></li>";
+					$('#chat').append(str);
+				}
+			}  
+		});
+		
+		
+		// 좌측 대화내용 추가
+		stomp.subscribe("/sub/chat/side/"+meNum,(chat)=>{
+			
+			let content = JSON.parse(chat.body);
+			
+			
+			let str = '';
+			let writer = content.writer;
+			let message = content.message;
+			
+			// 대화상대 배열
+			let array=[];
+			
+			// 대화상대 추가용
+			const $chattingList = document.getElementById('chattingList');
+			const talkUserNameH2 = $chattingList.getElementsByTagName('h2');
+			for(let i=0; i<talkUserNameH2.length; i++){
+				array.push(talkUserNameH2[i].innerText);
+			}
+			const $chattingPerson = document.getElementsByClassName('chattingPerson');
+
+			
+			// 현재 방문하고 있지 않은 roomId에서 내가 다른사람에게 메시지를 보낼 때
+			if(writer===me&&!array.includes(talkerName)){
+				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input id='hidden' type='hidden' name='talkerName' value='"+talkerName+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
+				str += "<h3>"+message+"</h3></label></button></form>";
+				$('#chattingList').prepend(str);
+			}
+			// 현재 방문하고 있지 않은 roomId에서 다름사람이 내게 메시지를 보낼 때
+			else if(writer!==me&&!array.includes(writer)){
+				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input id='hidden' type='hidden' name='talkerName' value='"+writer+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+writer+"</h2>";
+				str += "<span class='receive'></span>";
+				str += "<h3>"+message+"</h3></label></button></form>";
+				$('#chattingList').prepend(str);
+			}
+			// 현재 방문하고 있는 roomId에서 내가 상대에게 메시지를 보낼 때
+			else if(writer===me&&array.includes(talkerName)){
+				for(let i =0; i<array.length; i++){
+					if(array[i]===talkerName){
+						$chattingPerson[i].remove();
+					}
+				}
+				
+				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input id='hidden' type='hidden' name='talkerName' value='"+talkerName+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+talkerName+"</h2>";
+				str += "<h3>"+message+"</h3></label></button></form>";
+				$('#chattingList').prepend(str);
+			}
+			// 현재 방문하고 있는 roomId에서 상대가 내게 메시지를 보낼 때
+			else if(writer!==me&&array.includes(writer)){
+				for(let i =0; i<array.length; i++){
+					if(array[i]===writer){
+						$chattingPerson[i].remove();
+					}
+				}
+				
+				str += "<form action='/chat/visit' method='post' class='chattingPerson' id='chattingPerson'>";
+				str += "<input id='hidden' type='hidden' name='talkerName' value='"+writer+"'>"
+				str +="<button id='chattingListBTN' type='submit'>"
+				str += "<img class='userImg' src='/img/chat/user.png' alt=''>";
+				str += "<label id='deleteTag'>";
+				str += "<h2 id='talkUserName'>"+writer+"</h2>";
+				str += "<h3>"+message+"</h3></label></button></form>";
+				$('#chattingList').prepend(str);
+			}
+			array=[];
+		});
+
+	});
+
+
+	// 버튼 클릭 시 메시지 보내기
+	sendBTN=()=>{
+		let $msg = document.getElementById('msg');
+		if($msg.value!==""){
+			console.log(me + ":" + $msg.value);
+			stomp.send(
+				'/pub/chat/message',
+				{},
+				JSON.stringify({roomId: roomId, message: $msg.value, writer: me})
+			);
+			$msg.value = '';
+		}
+		
+		$msg.focus();
+		return false;
+	};
+	
+	// ENTER키 눌렀을 때 메시지 보내기
+	enterSend=(e)=>{
+		
+		let $msg = document.getElementById('msg');
+		
+		if (e.key === "Enter") {
+			e.preventDefault();
+
+			console.log(me + ":" + $msg.value);
+			stomp.send(
+				'/pub/chat/message', 
+				{}, 
+				JSON.stringify({roomId: roomId, message: $msg.value, writer: me})
+			);
+			
+			$msg.value = '';
+		}
+		return false;
+	};
+</script>
+
+
+<script>
+$(document).ready(()=>{
+	// 좌측 유저명 검색 input
+	let $searchUser = document.getElementById("searchUser");
+	// 클래스 명을 변경가능하게 하기위해 var을 사용
+	let $UserListDrop = document.getElementById("UserListDrop");
+	// 드롭다운 각각의 list의 버튼태그
+	let $UserListBTN=UserListDrop.getElementsByClassName('UserList');
+	
+	var $UserListCLA=[];
+	// 방향키 카운터
+	let count = -1;
+	let countSave = -1;
+	let option="" ;
+	let optionSave="";
+	
+	const countON=(count,option)=>{
+		
+		// 마우스 이벤트 시 포커스 이동
+		if(option==="mouse"){
+			// 마우스 오버 이벤트를 시작했을 때, 모든 포커스 제거
+			if(option!==optionSave){
+				// key이벤트와 마우스 이벤트를 연결시킴(최초 마우스 이벤트)
+				for(let i=0; i<$UserListBTN.length; i++){
+					$UserListBTN[i].classList.remove('on');
+				}
+			}
+			
+			// 마우스가 over된 상태에서 이동했을 시, 포커스 이동
+			else if(option===optionSave){
+				$UserListBTN[countSave].classList.remove('on');
+			}
+			
+			countSave=count;
+		}
+		// 방향키 이벤트 시 포커스 이동
+		else if(option==="key"){
+			// 드롭다운이 실행되어 있지 않다면
+			if(countSave===-1&&count===1&&!$UserListDrop.classList.contains('show')){
+				$UserListDrop.classList.toggle('show');
+			}
+			// 키 입력 시 이전에 맞춰져 있던 포커스 해제
+			if(countSave>-1){
+				$UserListBTN[countSave].classList.remove('on');
+			}
+			
+			countSave=countSave+count;
+			if(countSave>$UserListBTN.length-1){
+				countSave=$UserListBTN.length-1;
+			}
+			else if(countSave<0){
+				$UserListDrop.classList.remove('show');
+				countSave=-1;
+			}
+		}
+		// input에서 포커스가 아웃 되었을 때
+		else if(option==="reset"){
+			countSave=count;
+
+			for(let i=0; i<$UserListBTN.length; i++){
+				$UserListBTN[i].classList.remove('on');
+			}
+		}
+
+		// 같은 이벤트 발생 시 반복문이 다시 동작하지 않도록 함.
+		optionSave=option;
+		
+		// 이벤트가 실행될 때, 메뉴에 포커스가 맞춰짐
+		if(countSave>=0){
+			$UserListBTN[countSave].classList.add('on');
+
+			// input창에 유저명 입력
+			$searchUser.value=$UserListBTN[countSave].innerText;
+		}
+	};
+
+	// 좌측 검색창에서 user 검색
+	const userSearchFNC=(UserList)=>{
+		$UserListDrop.innerHTML="";
+		
+		// input창에 있는 유저명을 ajax로 db에서 검색
+		$.ajax({
+			type : 'POST',
+			url : "/chat/UserList",
+			dataType : "JSON",
+			data : ({
+				userid : UserList
+			}),
+			success:(response)=>{
+				response.forEach(item=>{
+					
+					// 드롭 다운 실행 조건
+					if(!$UserListDrop.classList.contains('show')&&item.userid!==null){
+						$UserListDrop.classList.add('show');						
+					}
+
+					// 드롭다운이 실행되면 userList출력
+					if($UserListDrop.classList.contains('show')){
+						let str = "<button class='UserList'>"+item.userid+"</button>";
+						$("#UserListDrop").append(str);
+					}
+				});
+				
+				// 드롭다운 각각의 list의 클레스
+				$UserListCLA = document.querySelectorAll('.UserList');
+				
+				
+				// 마우스 이벤트용 반복문
+				for(let i=0; i<$UserListCLA.length; i++){
+					// 드롭다운 메뉴에 마우스 오버했을 때
+					$UserListBTN[i].addEventListener('mouseover',()=>{
+						option= "mouse";
+						countON(i,option);
+					});
+				}
+				
+
+			},
+			error :()=>{
+				alert("알 수 없는 오류");
+			}
+		})
+	};
+		
+	keyEvent=(e)=>{
+		// 아랫방향키를 입력했을 때
+		if(e.key === "ArrowDown"){
+			// input창의 내용을 모두 제거
+			$searchUser.value="";
+			
+			count=1;
+			option="key";
+			
+		}
+		//윗 방향키를 입력했을 때
+		else if(e.key=== "ArrowUp"){
+			$searchUser.value="";
+			
+			count=-1;
+			option="key";
+		}
+		else if(e.keyCode === 13){
+			console.log("enter키 버튼");
+			document.getElementById('drop').onsubmit(); 
+		}
+		else{
+			return false;
+		}
+		countON(count,option);
+		
+	};
+	
+	// 클릭시  드롭다운 실행 함수 적용
+//	$searchUser.addEventListener('click', (event)=>{});
+	
+	// 드롭다운 종료
+	document.addEventListener('click',(event)=>{
+		
+		// 드롭다운 메뉴를 클릭하였을 경우
+		if(event.target.classList.contains('UserList')){
+			$UserListDrop.classList.remove('show');
+			$searchUser.focus();
+		} 
+		// 검색창을 클릭하였을 경우
+		else if(event.target===$searchUser){
+			userSearchFNC($searchUser.value);
+			
+			// 키 이벤트 실행
+			$searchUser.addEventListener('keydown',keyEvent);
+			
+			// input 이벤트 실행
+			$searchUser.addEventListener('input', ()=>{
+				userSearchFNC($searchUser.value);
+			});
+		}else if(event.target===document.getElementById('msg')||event.target===document.getElementById('dm')){
+			return false;
+		}
+		else{
+			$UserListDrop.classList.remove('show');
+			// 드롭다운 리셋
+			countON(-1,"reset")
+			$searchUser.focus();
+		}
+	});
+});
+</script>
+
+<body>
+	<div class="chat_container" style="background-color: #eff3f7;">
+		<aside>
+			
+			<header>
+				<div id="userPlusButton"></div>
+				<form id="drop" th:action="@{/chat/visit}" method="post">
+					<input type="text" id="searchUser" name="talkerName" placeholder="search">	
+				</form>
+				
+				<div class="UserListDrop" id="UserListDrop">
+			</header>
+			
+			<!-- 왼쪽 대화상대 창 -->
+			<ul class='chattingList' id='chattingList'></ul>
+			
+		</aside>
+
+		<main>
+			<header>
+				<img src="/img/chat/user.png" alt="">
+				<div>
+					<h2 th:text="${talkerName}"></h2>
+				</div>
+			</header>
+
+			<!-- 메시지 전송 및 받기 -->
+			<div class="body" style="vertical-align: bottom">
+				<ul id="chat"></ul>
+			</div>
+				
+			<footer>	
+				<input type="text" placeholder="입력하시오." id="msg" onkeypress="enterSend(event)">
+				<button type="button" id="sendBTN" onclick="sendBTN()">
+					<img src="/img/chat/dm.png" class="dm-icon" id='dm' alt="">
+				</button>
+			</footer>	
+		</main>
+	</div>
+</body>
+</html>

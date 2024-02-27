@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+</head>
+<link th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css}" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/error.css}">
+<link th:href="@{https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css}" rel="stylesheet">
+<body>
+    <div class="page-404">
+        <div class="outer">
+            <div class="middle">
+                <div class="inner">
+                    <!--BEGIN CONTENT-->
+                    <div class="inner-circle"><i class="fa fa-home"></i><span>500</span></div>
+                    <span class="inner-status">페이지를 표시할 수 없습니다.</span>
+                    <span class="inner-detail">
+                        <button onclick="location.href='/view/dashboard'" class="btn btn-success">로그인 화면으로 이동</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

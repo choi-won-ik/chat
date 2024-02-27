@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>Insert title here</title>
+</head>
+<link th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css}" rel="stylesheet">
+<link th:href="@{https://getbootstrap.com/docs/4.0/examples/signin/signin.css}" rel="stylesheet">
+<script>
+window.onload=()=>{
+	const logoutBtn = document.getElementById('logout_btn');
+	logoutBtn.addEventListener('click', () => {
+		sessionStorage.setItem('userid', '');
+	});
+};	
+</script>
+<body>
+	<div class="container">
+		<h3 class="form-signin-heading text-center mb-5">chat</h3>
+
+		<h3 class="overview-normalize">접속 아이디</h3>
+		<h2 id='login_id' th:text="${loginId}"></h2>
+		<hr>
+			<h3 class="overview-normalize">채팅방으로 이동</h3>
+			
+			<div>
+				<button onclick="location.href='/chat/main'" class="btn btn-sm btn-primary">채팅방 이동</button>
+			</div>
+		<hr/>
+		<form method="post" action="/logout">
+			<button class="btn btn-sm btn-danger btn-block" type="submit" id="logout_btn">로그아웃</button>
+		</form>
+		
+	    
+	</div>
+</body>
+</html>
