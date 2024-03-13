@@ -123,11 +123,6 @@ public class ChatServiceImpl implements ChatService{
 	}
 
 	@Override
-	public Long number(String me) {
-		return memberRepository.findIdByUserid(me);
-	}
-
-	@Override
 	public boolean proper(Long meNum,String roomId) {
 		int user1 = 0;
 		int user2 = 0;

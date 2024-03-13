@@ -19,7 +19,7 @@ public class RegisterMemberService {
 	}
 
 	public Long join(String userid, String pw) {
-		Member member = Member.createUser(userid, pw, passwordEncoder);
+		Member member = Member.createUser(userid, pw, passwordEncoder,0);
 		validateDuplicateMember(member);
 		repository.save(member);
 

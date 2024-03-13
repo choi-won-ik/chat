@@ -22,8 +22,12 @@ public class Member {
 
     @Column(nullable = false, length = 100)
     private String pw;
+    
+	@Column(nullable = false, length = 1)
+	private int profile;
+    
 
-    public static Member createUser(String userId, String pw, PasswordEncoder passwordEncoder) {
-        return new Member(null, userId, passwordEncoder.encode(pw));
+    public static Member createUser(String userId, String pw, PasswordEncoder passwordEncoder,int profile) {
+        return new Member(null, userId, passwordEncoder.encode(pw),profile);
     }
 }

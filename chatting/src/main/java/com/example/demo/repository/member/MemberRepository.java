@@ -18,7 +18,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     CopyOnWriteArrayList<Member> findByUseridStartingWith(String userid);
 	
 	// 유저명으로 해당 id값 불러옴
-//	Long findIdByUserid(String SomeoneName);
 	@Query(
 			value= "SELECT id from member WHERE userid = :talkerName",
 			nativeQuery  = true
@@ -30,4 +29,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 			nativeQuery  = true
 			)
 	String findUserById(@Param("talkerName") long talkerName);
+
+	@Query(
+			value= "SELECT * from member WHERE userid = :me",
+			nativeQuery  = true
+			)
+	Member findMemberByUserid(@Param("me") String me);
+	
 }

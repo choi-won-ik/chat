@@ -6,38 +6,142 @@
 <meta name="author" content="">
 <title>Insert title here</title>
 </head>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js}"></script>
 <link th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css}" rel="stylesheet">
 <link th:href="@{https://getbootstrap.com/docs/4.0/examples/signin/signin.css}" rel="stylesheet">
+<link th:href="@{/css/login.css}" rel="stylesheet">
+<script th:inline="javascript">
+	let byte=/*[[${byte}]]*/[];
+</script>
 <script>
 window.onload=()=>{
+	// 로그인 및 로그아웃
 	const logoutBtn = document.getElementById('logout_btn');
+	const $title = document.getElementById('title');
+	// 모달 이미지
+	const $imgEx = document.getElementById('imgEx');
+	
+	if(byte!==null){
+		$('#title .profileImg').remove();
+		$imgEx.innerHTML="";
+		console.log(byte);
+		let blob = new Blob([byte], { type: 'image/*' });
+		let blobUrl = URL.createObjectURL(blob);
+		
+		$(".imgEx").prepend("<img src='"+blobUrl+"' alt=''>");
+//		let $img=document.createElement('img');
+//		$img.src = blobUrl;
+//		$img.classList.add('profileImg');
+//		$("#title").prepend($img);
+		$("#title").prepend("<img class='profileImg' src='"+blobUrl+"' alt=''>");
+		
+		
+	}
+	
+	
 	logoutBtn.addEventListener('click', () => {
 		sessionStorage.setItem('userid', '');
+	});
+	
+	// 모달 여,닫기
+	const $modalOn = document.getElementById('modal-on');
+	const $modal = document.getElementById('modal');
+	const $black = document.getElementById('black');
+	const $modalClose = document.getElementById('modal-close');
+
+	$modalOn.addEventListener('click',()=>{
+		$modal.classList.remove('hidden');
+	});
+
+	$modalClose.addEventListener('click',()=>{
+		$modal.classList.add('hidden');
+	});
+
+	document.addEventListener('keydown',(e)=>{
+		if(!$modal.classList.contains('hidden')){
+			if(e.keyCode===27){
+				$modal.classList.add('hidden');
+			}
+		}
+	});
+
+	// 이미지 관리
+	let $file = document.getElementById('file');
+
+	$file.addEventListener('change', function() {
+
+		if(window.FileReader){
+			if (!this.files || !this.files[0] || !this.files[0].type.match(/image\//)){
+				alert('이미지가 아닙니다.');
+				return;
+			}
+
+			let reader = new FileReader();
+			let file = this.files[0];
+
+			// 파일 이름
+			let uploadNameElement = this.nextElementSibling;
+			if (uploadNameElement.classList.contains('file-name')) {
+				uploadNameElement.value = file.name;
+			}
+			// 파일 이미지
+			reader.onload=(e)=>{
+				let src = e.target.result;
+				$imgEx.innerHTML="";
+				$(".imgEx").prepend("<img src='"+src+"' alt=''>");
+			};
+
+			reader.readAsDataURL(file);
+		}
 	});
 };	
 </script>
 <body>
 	<div class="container">
 		<h3 class="form-signin-heading text-center mb-5">chat</h3>
-
+		
+		
 		<h3 class="overview-normalize">접속 아이디</h3>
-		<h2 id='login_id' th:text="${loginId}"></h2>
+      <label id="title" class="title">
+        <img class="profileImg" src='/img/chat/user.png' alt=''>
+        <h2 id='login_id' class="user" th:text="${loginId}"></h2>
+      </label>
 		<hr>
-			<h3 class="overview-normalize">채팅방으로 이동</h3>
+
+
+		<h3 class="overview-normalize">채팅방으로 이동</h3>
 			
-			<div>
-				<button onclick="location.href='/chat/main'" class="btn btn-sm btn-primary">채팅방 이동</button>
-				<form th:action="@{/profile}" method="post">
-					<label for="profile">
-						<submit class="btn btn-sm btn-dark">프로필 변경</submit>
-					</label>
-					<input id="profile" type="file" style="display:none;">
-				</form>
-			</div>
+		<div >
+			<button onclick="location.href='/chat/main'" class="btn btn-sm btn-primary">채팅방 이동</button>
+			<button id="modal-on" class="btn btn-sm btn-dark">이미지 선택</button>
+		</div>
 		<hr/>
 		<form method="post" action="/logout">
 			<button class="btn btn-sm btn-danger btn-block" type="submit" id="logout_btn">로그아웃</button>
 		</form>
+
+		<div class="modal hidden" id="modal">
+			<div class="modal-body">
+				<div> 프로필 선택
+					<button id="modal-close" style="background-color: #cfe2ff;" class="bi bi-x-lg">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+							<path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+						</svg>
+					</button>
+				</div>
+				
+				<label class="imgEx" id="imgEx">
+					<img src="/img/chat/user.png" alt="">
+				</label>
+				
+				<form th:action="@{/profile}" class="form" method="post" enctype="multipart/form-data">
+					<label for="file">업로드</label>
+					<input type="file" name="file" class="file" id="file" multiple="multiple" required/>
+					<input class="file-name" value="파일선택" disabled="disabled">
+					<button type="submit" id="submit" class="btn btn" >확인</button>
+				</form>
+			</div>
+		</div>
 	</div>
 </body>
 </html>

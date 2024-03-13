@@ -29,4 +29,9 @@ public class MemberService {
         }
         return false;
     }
+    
+    // 유정명으로 고유 id찾기
+    public Long number(String me) {
+		return memberRepository.findIdByUserid(me);
+	}
 }

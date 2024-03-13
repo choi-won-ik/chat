@@ -12,12 +12,15 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo.Entity.chat.Chat;
 import com.example.demo.Entity.chat.ChattingRoom;
 import com.example.demo.service.chat.ChatService;
+import com.example.demo.service.member.MemberService;
 
 @Controller
 @RequestMapping(value = "/chat")
 public class ChatController {
 	@Autowired
 	private ChatService chatService;	
+	@Autowired
+	private MemberService memberService;
 	
 	// 채팅 main Page 실행
 	@GetMapping("/main")
@@ -33,7 +36,7 @@ public class ChatController {
 		// 좌측 채팅 리스트
 		model.addAttribute("talkList", talkList);
 		// 메시지 받기용 내 고유아이디
-		model.addAttribute("meNum",chatService.number(me));
+		model.addAttribute("meNum",memberService.number(me));
 		
 		return "/chat/mainRoom";
 	}
@@ -65,7 +68,7 @@ public class ChatController {
 		model.addAttribute("receive",chatService.receive(roomId,me));
 		System.out.println(chatService.receive(roomId,me));
 		// 메시지 받기용 내 고유아이디
-		Long meNum=chatService.number(me);
+		Long meNum=memberService.number(me);
 		model.addAttribute("meNum",meNum);
 		
 		// 권한이 없는 채팅방에는 입장 불가능
