@@ -11,7 +11,7 @@
 <link th:href="@{https://getbootstrap.com/docs/4.0/examples/signin/signin.css}" rel="stylesheet">
 <link th:href="@{/css/login.css}" rel="stylesheet">
 <script th:inline="javascript">
-	let byte=/*[[${byte}]]*/[];
+	let data=/*[[${data}]]*/"";
 </script>
 <script>
 window.onload=()=>{
@@ -21,18 +21,21 @@ window.onload=()=>{
 	// 모달 이미지
 	const $imgEx = document.getElementById('imgEx');
 	
-	if(byte!==null){
+	if(data!==null){
 		$('#title .profileImg').remove();
 		$imgEx.innerHTML="";
-		console.log(byte);
-		let blob = new Blob([byte], { type: 'image/*' });
+		
+//		let dataArr = new Uint8Array(data);
+		let blob = new Blob([data], { type: 'image/jpg' });
 		let blobUrl = URL.createObjectURL(blob);
+		
+		
 		
 		$(".imgEx").prepend("<img src='"+blobUrl+"' alt=''>");
 //		let $img=document.createElement('img');
 //		$img.src = blobUrl;
 //		$img.classList.add('profileImg');
-//		$("#title").prepend($img);
+//		$title.appendChild($img);
 		$("#title").prepend("<img class='profileImg' src='"+blobUrl+"' alt=''>");
 		
 		

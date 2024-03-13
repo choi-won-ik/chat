@@ -46,6 +46,8 @@ public class ProfileService {
 		// 아미지파일을 byte로 정의
 		byte[] data = img.getBytes();
 		
+		log.info(data);
+		
 		Profile picture = Profile.builder()
 				.userid(me)
 				.fileName(imgName)
