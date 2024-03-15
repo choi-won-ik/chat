@@ -12,6 +12,7 @@
 <link th:href="@{/css/login.css}" rel="stylesheet">
 <script th:inline="javascript">
 	let data=/*[[${data}]]*/"";
+	let extensions=/*[[${extensions}]]*/"";
 </script>
 <script>
 window.onload=()=>{
@@ -25,22 +26,27 @@ window.onload=()=>{
 		$('#title .profileImg').remove();
 		$imgEx.innerHTML="";
 		
-//		let dataArr = new Uint8Array(data);
-		let blob = new Blob([data], { type: 'image/jpg' });
+		let byteCharacters = atob(data);
+		let byteNumbers = new Array(byteCharacters.length);
+	    for (let i = 0; i < byteCharacters.length; i++) {
+	        byteNumbers[i] = byteCharacters.charCodeAt(i);
+	    }
+	    
+	    var byteArray = new Uint8Array(byteNumbers);
+		
+		let blob = new Blob([byteArray], { type: "image/"+extensions });
 		let blobUrl = URL.createObjectURL(blob);
 		
+		console.log(blobUrl);
 		
-		
-		$(".imgEx").prepend("<img src='"+blobUrl+"' alt=''>");
-//		let $img=document.createElement('img');
-//		$img.src = blobUrl;
-//		$img.classList.add('profileImg');
-//		$title.appendChild($img);
-		$("#title").prepend("<img class='profileImg' src='"+blobUrl+"' alt=''>");
-		
-		
+		let $img=document.createElement('img');
+//		$img.src = "data:image/"+extensions+";base64,"+data;
+		$img.src = blobUrl;
+		$img.alt = 'Uploaded Image';
+		$img.classList.add('profileImg');
+		$title.prepend($img);
+		$("#imgEx").prepend("<img src="+blobUrl+" alt=''>");
 	}
-	
 	
 	logoutBtn.addEventListener('click', () => {
 		sessionStorage.setItem('userid', '');

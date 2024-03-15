@@ -1,6 +1,5 @@
 package com.example.demo.service.member;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,5 +32,9 @@ public class MemberService {
     // 유정명으로 고유 id찾기
     public Long number(String me) {
 		return memberRepository.findIdByUserid(me);
+	}
+
+	public int memberProfile(String me) {
+		return memberRepository.findProfileByUserid(me);
 	}
 }

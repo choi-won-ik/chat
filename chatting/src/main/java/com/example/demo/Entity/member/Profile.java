@@ -1,9 +1,5 @@
 package com.example.demo.Entity.member;
 
-import java.io.Serializable;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,5 +30,8 @@ public class Profile{
 	@Lob
 	@Column(length = 9999999)
 	private byte[] data;
+	
+	@Column(length = 5,nullable = false)
+	private String Extensions;
 
 }
