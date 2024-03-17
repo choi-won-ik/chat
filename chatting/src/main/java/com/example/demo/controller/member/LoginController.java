@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.demo.Entity.member.Profile;
+import com.example.demo.Entity.member.Member;
 import com.example.demo.dto.member.MemberLoginDto;
 import com.example.demo.service.member.MemberService;
 import com.example.demo.service.member.ProfileService;
@@ -46,7 +46,7 @@ public class LoginController {
 		webPath = webPath.replace("\\", "/");
 		
 		try {
-			profileService.addProfile(Profile.builder().build(), file,me,webPath);
+			profileService.addProfile(file,me,webPath);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

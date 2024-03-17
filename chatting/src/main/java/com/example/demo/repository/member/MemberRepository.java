@@ -36,10 +36,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 			)
 	Member findMemberByUserid(@Param("me") String me);
 
-	@Query(
-			value= "SELECT profile from member WHERE userid = :me",
-			nativeQuery  = true
-			)
-	int findProfileByUserid(@Param("me")String me);
-	
 }

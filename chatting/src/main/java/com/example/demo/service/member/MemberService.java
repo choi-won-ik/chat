@@ -10,8 +10,8 @@ import java.util.Optional;
 
 @Service
 public class MemberService {
-    private final MemberRepository memberRepository;
-
+	@Autowired
+    private MemberRepository memberRepository;
     @Autowired
     public MemberService(MemberRepository repository) {
         this.memberRepository = repository;
@@ -34,7 +34,7 @@ public class MemberService {
 		return memberRepository.findIdByUserid(me);
 	}
 
-	public int memberProfile(String me) {
-		return memberRepository.findProfileByUserid(me);
+	public Member findByUserid(String me) {
+		return memberRepository.findByUserid(me).get();
 	}
 }

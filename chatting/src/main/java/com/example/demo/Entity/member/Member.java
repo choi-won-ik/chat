@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,14 +22,20 @@ public class Member {
     @Column(unique = true, nullable = false, length = 11)
     private String userid;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private String pw;
     
 	@Column(nullable = false, length = 1)
 	private int profile;
+	
+	@Lob
+	@Column(length = 9999999)
+	private byte[] data;
+	
+	@Column(length = 5)
+	private String Extensions;
     
-
     public static Member createUser(String userId, String pw, PasswordEncoder passwordEncoder,int profile) {
-        return new Member(null, userId, passwordEncoder.encode(pw),profile);
+        return new Member(null, userId, passwordEncoder.encode(pw),profile,null,null);
     }
 }
