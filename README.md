@@ -33,7 +33,7 @@
     
 ![kafka프로듀서](https://github.com/user-attachments/assets/a8eae357-fd6b-403f-b062-0881433a74b6)
 
-![kafka리스너](https://github.com/user-attachments/assets/63515588-9aca-4200-baf3-4713c066de44)
+![kafka 리스너](https://github.com/user-attachments/assets/44975331-de91-4fa0-8c5b-47b6011bfc85)
 
      
 
