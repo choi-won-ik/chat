@@ -29,7 +29,9 @@
 
 ![WebSocket설정](https://github.com/user-attachments/assets/2b048555-5951-4abc-81b9-f9fdda9f2d61)
 
-    - kafka 설정
+    - kakfa 설정
+
+![docker cmd](https://github.com/user-attachments/assets/0158192e-28e7-4624-8590-1af581b258d6)
     
 ![kafka프로듀서](https://github.com/user-attachments/assets/a8eae357-fd6b-403f-b062-0881433a74b6)
 
