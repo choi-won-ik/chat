@@ -21,10 +21,23 @@
 * Docker
 * kafka
 
-
 #### 구현 부분
+* 실시간 의사소통 기능
+    - Stomp와 sockJS를 설정
+  
+![stomp와sockJS](https://github.com/user-attachments/assets/3621cea3-7548-4d5c-a338-6313d0d52f49)
+
+![WebSocket설정](https://github.com/user-attachments/assets/2b048555-5951-4abc-81b9-f9fdda9f2d61)
+
+    - kafka 설정
+    
+![kafka프로듀서](https://github.com/user-attachments/assets/a8eae357-fd6b-403f-b062-0881433a74b6)
+
+![kafka리스너](https://github.com/user-attachments/assets/63515588-9aca-4200-baf3-4713c066de44)
+
+     
+
 * 채팅페이지
-    - 실시간 의사소통 가능
     - 부재중 온 메시지 표시
         + 확인하면 표시가 사라짐
     - 모달 및 드롭다운으로 채팅할 유저 검색
