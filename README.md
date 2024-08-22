@@ -23,13 +23,13 @@
 
 #### 구현 부분
 * 실시간 의사소통 기능
-    Stomp와 sockJS를 설정
+    - Stomp와 sockJS를 설정
   
-![stomp와sockJS](https://github.com/user-attachments/assets/3621cea3-7548-4d5c-a338-6313d0d52f49)
+    ![stomp와sockJS](https://github.com/user-attachments/assets/3621cea3-7548-4d5c-a338-6313d0d52f49)
 
-![WebSocket설정](https://github.com/user-attachments/assets/2b048555-5951-4abc-81b9-f9fdda9f2d61)
+    ![WebSocket설정](https://github.com/user-attachments/assets/2b048555-5951-4abc-81b9-f9fdda9f2d61)
 
-    kakfa 설정
+    - kakfa 설정
 
 ![docker cmd](https://github.com/user-attachments/assets/0158192e-28e7-4624-8590-1af581b258d6)
     
