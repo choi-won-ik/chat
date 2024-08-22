@@ -31,11 +31,11 @@
 
     - kakfa 설정
 
-![docker cmd](https://github.com/user-attachments/assets/0158192e-28e7-4624-8590-1af581b258d6)
+    ![docker cmd](https://github.com/user-attachments/assets/0158192e-28e7-4624-8590-1af581b258d6)
     
-![kafka프로듀서](https://github.com/user-attachments/assets/a8eae357-fd6b-403f-b062-0881433a74b6)
+    ![kafka프로듀서](https://github.com/user-attachments/assets/a8eae357-fd6b-403f-b062-0881433a74b6)
 
-![kafka 리스너](https://github.com/user-attachments/assets/44975331-de91-4fa0-8c5b-47b6011bfc85)
+    ![kafka 리스너](https://github.com/user-attachments/assets/44975331-de91-4fa0-8c5b-47b6011bfc85)
 
      
 
