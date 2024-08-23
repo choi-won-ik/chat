@@ -14,6 +14,7 @@
 프로젝트 개발환경은 다음과 같습니다.
 
 #### 개발환경
+* SpringBoot framework
 * SpringBoot JPA
 * Java
 * Gradle
